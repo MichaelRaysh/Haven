@@ -1,0 +1,10 @@
+{
+  "name": "haven-nurse-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx serve . -l 5000",
+    "deploy": "npx netlify-cli deploy --dir=. --prod"
+  },
+  "devDependencies": {}
+}
