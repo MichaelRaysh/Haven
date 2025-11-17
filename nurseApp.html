@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Haven Nurse App (Standalone)</title>
+  <title>Haven Nurse App</title>
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.40.0"></script>
   <!-- Embedded Tailwind-like utility CSS (large, offline) -->
   <style>
     /* Basic reset and utilities (Tailwind-like subset) */
@@ -134,64 +136,225 @@
       <div style="margin-top:1rem;font-size:.85rem;color:#94a3b8">Signed in as <span id="userLabel">Guest</span></div>
     </aside>
     <main class="main">
-      <div class="header">
-        <button id="hamburger" onclick="toggleSidebar()" style="display:none;margin-right:.5rem;background:transparent;border:0;color:var(--muted);font-size:1.2rem">☰</button>
-        <h1 id="title">Dashboard</h1>
-        <div class="flex"><button class="btn" id="refreshBtn">Refresh</button></div>
+      <div class="header" style="justify-content: space-between;">
+        <div style="display: flex; align-items: center;">
+          <button id="hamburger" onclick="toggleSidebar()" style="display:none;margin-right:.5rem;background:transparent;border:0;color:var(--muted);font-size:1.2rem">☰</button>
+          <h1 id="title">Dashboard</h1>
+        </div>
+        <div class="flex" style="gap: .5rem;">
+          <button class="btn" id="refreshBtn">Refresh</button>
+          <button class="btn" style="background: #dc2626;" onclick="logout()">Logout</button>
+        </div>
       </div>
       <div id="content"></div>
     </main>
   </div>
 
   <script>
-    // Minimal standalone app state
+    // ===== SUPABASE INITIALIZATION =====
+    // Replace these with your actual Supabase credentials
+    const SUPABASE_URL = 'https://your-project.supabase.co';
+    const SUPABASE_KEY = 'your-anon-key';
+    
+    const { createClient } = supabase;
+    const client = createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // Global auth state
+    let currentSession = null;
+    
+    // App state
     const today = '2025-11-13';
     const state = {
-      currentUser: { username: 'nurse_sarah' },
+      currentUser: null,
       activeTab: 'dashboard',
-      patients: [
-        { id: 1, name: 'John Doe', age: 82, allergies: 'Penicillin', conditions: 'HTN', lastVisit: '2025-11-10' },
-        { id: 2, name: 'Jane Smith', age: 73, allergies: 'None', conditions: 'COPD', lastVisit: '2025-11-09' },
-        { id: 3, name: 'Bob Johnson', age: 86, allergies: 'Sulfa', conditions: 'Heart Disease', lastVisit: '2025-11-08' }
-      ],
-      medications: [
-        { id:1, patient:'John Doe', drug:'Lisinopril', dosage:'10mg', frequency:'Once daily', status:'on-time' },
-        { id:2, patient:'Jane Smith', drug:'Metformin', dosage:'500mg', frequency:'Twice daily', status:'due-soon' }
-      ],
-      appointments: [
-        { id:1, patient:'John Doe', date:'2025-11-12', time:'10:00 AM', type:'Wound Care', address:'123 Main St' },
-        { id:2, patient:'Jane Smith', date:'2025-11-12', time:'3:00 PM', type:'Medication Review', address:'456 Oak Ave' }
-      ],
-      messages: [
-        { id:1, from:'Dr. Chen', to:'You', message:'Please check John Doe', time:'9:30 AM', read:false }
-      ],
-      alerts: [
-        { id:1, priority:'high', message:'Medication due for John Doe - Lisinopril 10mg', time:'2 hours ago' }
-      ],
-      notes: [
-        { id:1, author:'nurse_sarah', patient:'John Doe', title:'BP Check', content:'BP 145/90', category:'vital-signs', timestamp:'2025-11-13 09:30' },
-        { id:2, author:'admin_john', patient:'Jane Smith', title:'Medication Compliance', content:'Missed morning dose', category:'medication', timestamp:'2025-11-12 14:15' },
-        { id:3, author:'nurse_mary', patient:'Bob Johnson', title:'Wound Assessment', content:'Healing well', category:'care', timestamp:'2025-11-12 11:00' }
-      ],
-      noteFilter: 'all',
-      isAddingNote: false,
-      newNote: { patient:'', title:'', content:'', category:'general' },
-      signature: null,
-      isDrawing: false,
-      capturedPhoto: null,
-      cameraActive: false,
-      isRecording: false,
+      patients: [],
+      medications: [],
+      appointments: [],
+      messages: [],
+      mileageTrips: [],
+      notes: [],
       voiceNotes: [],
+      alerts: [],
       auditLog: [],
-      mileageEnabled: false,
-      mileageTrips: [
-        { id:1, date:'2025-11-13', patient:'John Doe', startAddress:'Office - 100 Main St', endAddress:'123 Main St', miles:2.3, duration:'8 mins', purpose:'Wound Care', reimbursable: true },
-        { id:2, date:'2025-11-13', patient:'Jane Smith', startAddress:'123 Main St', endAddress:'456 Oak Ave', miles:4.1, duration:'12 mins', purpose:'Medication Review', reimbursable: true }
-      ],
-      newTrip: { patient:'', startAddress:'', endAddress:'', miles:0, duration:'', purpose:'' },
-      showAddTrip: false
+      isAddingNote: false,
+      noteFilter: 'all',
+      showAddTrip: false,
+      cameraActive: false,
+      signature: null,
+      capturedPhoto: null,
+      mileageEnabled: true,
+      newNote: { patient: '', title: '', content: '', category: '' },
+      newPatient: { name: '', age: '', allergies: '', conditions: '' },
+      newMed: { patient: '', drug: '', dosage: '', frequency: '' },
+      newTrip: { date: today, miles: 0, destination: '', purpose: '' }
     };
 
+    // ===== AUTHENTICATION FUNCTIONS =====
+    async function login(email, password) {
+      try {
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        currentSession = data.session;
+        state.currentUser = { id: data.user.id, email: data.user.email };
+        await loadUserData();
+        render();
+      } catch (error) {
+        alert('Login failed: ' + error.message);
+      }
+    }
+
+    async function signup(email, password, username) {
+      try {
+        const { data, error } = await client.auth.signUp({ email, password });
+        if (error) throw error;
+        
+        // Create user profile in database
+        const { error: profileError } = await client
+          .from('profiles')
+          .insert({ id: data.user.id, email, username });
+        
+        if (profileError) throw profileError;
+        
+        currentSession = data.session;
+        state.currentUser = { id: data.user.id, email, username };
+        await loadUserData();
+        render();
+      } catch (error) {
+        alert('Signup failed: ' + error.message);
+      }
+    }
+
+    async function logout() {
+      try {
+        await client.auth.signOut();
+        currentSession = null;
+        state.currentUser = null;
+        state.activeTab = 'dashboard';
+        render();
+      } catch (error) {
+        alert('Logout failed: ' + error.message);
+      }
+    }
+
+    async function loadUserData() {
+      if (!currentSession) return;
+      
+      try {
+        const userId = state.currentUser.id;
+        
+        // Load all user data from Supabase in parallel
+        const [patients, medications, appointments, messages, notes, trips, voiceNotes, alerts] = await Promise.all([
+          client.from('patients').select('*').eq('user_id', userId),
+          client.from('medications').select('*').eq('user_id', userId),
+          client.from('appointments').select('*').eq('user_id', userId),
+          client.from('messages').select('*').eq('user_id', userId),
+          client.from('notes').select('*').eq('user_id', userId),
+          client.from('mileage_trips').select('*').eq('user_id', userId),
+          client.from('voice_notes').select('*').eq('user_id', userId),
+          client.from('alerts').select('*').eq('user_id', userId)
+        ]);
+        
+        state.patients = patients.data || [];
+        state.medications = medications.data || [];
+        state.appointments = appointments.data || [];
+        state.messages = messages.data || [];
+        state.notes = notes.data || [];
+        state.mileageTrips = trips.data || [];
+        state.voiceNotes = voiceNotes.data || [];
+        state.alerts = alerts.data || [];
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      }
+    }
+
+    // ===== DATA SAVE FUNCTIONS =====
+    async function addPatient(name, age, allergies, conditions) {
+      if (!currentSession) { alert('Must be logged in'); return; }
+      try {
+        const { error } = await client.from('patients').insert({
+          user_id: state.currentUser.id,
+          name, age, allergies, conditions,
+          last_visit: today
+        });
+        if (error) throw error;
+        await loadUserData();
+        state.newPatient = { name: '', age: '', allergies: '', conditions: '' };
+        render();
+      } catch (error) {
+        alert('Error adding patient: ' + error.message);
+      }
+    }
+
+    async function addMedication(patient, drug, dosage, frequency) {
+      if (!currentSession) { alert('Must be logged in'); return; }
+      try {
+        const { error } = await client.from('medications').insert({
+          user_id: state.currentUser.id,
+          patient, drug, dosage, frequency, status: 'on-time'
+        });
+        if (error) throw error;
+        await loadUserData();
+        state.newMed = { patient: '', drug: '', dosage: '', frequency: '' };
+        render();
+      } catch (error) {
+        alert('Error adding medication: ' + error.message);
+      }
+    }
+
+    async function addTrip(date, miles, destination, purpose) {
+      if (!currentSession) { alert('Must be logged in'); return; }
+      try {
+        const { error } = await client.from('mileage_trips').insert({
+          user_id: state.currentUser.id,
+          date, miles: parseFloat(miles), destination, purpose
+        });
+        if (error) throw error;
+        await loadUserData();
+        state.showAddTrip = false;
+        state.newTrip = { date: today, miles: 0, destination: '', purpose: '' };
+        render();
+      } catch (error) {
+        alert('Error adding trip: ' + error.message);
+      }
+    }
+
+    async function sendMsg(recipientEmail, subject, body) {
+      if (!currentSession) { alert('Must be logged in'); return; }
+      try {
+        const { error } = await client.from('messages').insert({
+          user_id: state.currentUser.id,
+          sender: state.currentUser.email,
+          recipient: recipientEmail,
+          subject, body,
+          timestamp: new Date().toISOString()
+        });
+        if (error) throw error;
+        await loadUserData();
+        render();
+      } catch (error) {
+        alert('Error sending message: ' + error.message);
+      }
+    }
+
+    async function saveNote(patient, title, content, category) {
+      if (!currentSession) { alert('Must be logged in'); return; }
+      try {
+        const { error } = await client.from('notes').insert({
+          user_id: state.currentUser.id,
+          patient, title, content, category,
+          timestamp: new Date().toISOString()
+        });
+        if (error) throw error;
+        await loadUserData();
+        state.isAddingNote = false;
+        state.newNote = { patient: '', title: '', content: '', category: '' };
+        render();
+      } catch (error) {
+        alert('Error saving note: ' + error.message);
+      }
+    }
+
+    // ===== RENDER FUNCTION =====
     const tabs = [
       { id:'dashboard', label:'Dashboard' },
       { id:'notes', label:'Clinical Notes' },
@@ -207,10 +370,68 @@
       { id:'audit', label:'Audit Log' }
     ];
 
+    // ===== LOGIN UI HANDLERS =====
+    let isSignupMode = false;
+    
+    function toggleSignup() {
+      isSignupMode = !isSignupMode;
+      const fields = document.getElementById('signupFields');
+      if (fields) fields.style.display = isSignupMode ? 'block' : 'none';
+      const btn = event.target;
+      btn.textContent = isSignupMode ? 'Back to Login' : 'Create Account';
+      if (isSignupMode) {
+        document.querySelector('button.btn').textContent = 'Sign Up';
+      } else {
+        document.querySelector('button.btn').textContent = 'Log In';
+      }
+    }
+    
+    function handleLogin() {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      
+      if (!email || !password) {
+        alert('Please enter email and password');
+        return;
+      }
+      
+      if (isSignupMode) {
+        const username = document.getElementById('authUsername').value.trim();
+        if (!username) {
+          alert('Please enter a username');
+          return;
+        }
+        signup(email, password, username);
+      } else {
+        login(email, password);
+      }
+    }
+    
+    // ===== HELPER FUNCTIONS =====
+    function renderNav(){
+      const nav = document.getElementById('nav');
+      if (nav) nav.innerHTML = tabs.map(t=>`<button class="${t.id===state.activeTab? 'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`).join('');
+      const userLabel = document.getElementById('userLabel');
+      if (userLabel) userLabel.textContent = state.currentUser?.email?.split('@')[0] || 'User';
+    }
+
+    function logAudit(action, details) {
+      if (currentSession) {
+        state.auditLog.push({
+          user: state.currentUser.email,
+          action,
+          details,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+
+    function setTab(id){ state.activeTab = id; render(); }
+
     function renderNav(){
       const nav = document.getElementById('nav');
       nav.innerHTML = tabs.map(t=>`<button class="${t.id===state.activeTab? 'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`).join('');
-      document.getElementById('userLabel').textContent = state.currentUser?.username || 'Guest';
+      document.getElementById('userLabel').textContent = state.currentUser?.email?.split('@')[0] || 'User';
     }
 
     function toggleSidebar(){
@@ -219,9 +440,45 @@
       sb.classList.toggle('open');
     }
 
-    function setTab(id){ state.activeTab = id; render(); }
-
     function render(){
+      const main = document.querySelector('main');
+      
+      if(!currentSession) {
+        // Show login/signup screen
+        main.innerHTML = `
+          <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)">
+            <div class="card" style="width:100%;max-width:400px;padding:2rem">
+              <h1 style="text-align:center;margin:0 0 2rem 0;color:#333">Haven</h1>
+              <h2 style="text-align:center;font-size:1.125rem;margin:0 0 1.5rem 0;color:#666">Healthcare Mobile App</h2>
+              
+              <div id="authForm">
+                <div style="margin-bottom:1rem">
+                  <label style="display:block;margin-bottom:.5rem;font-weight:600">Email</label>
+                  <input type="email" id="authEmail" placeholder="your@email.com" style="width:100%" />
+                </div>
+                <div style="margin-bottom:1rem">
+                  <label style="display:block;margin-bottom:.5rem;font-weight:600">Password</label>
+                  <input type="password" id="authPassword" placeholder="••••••••" style="width:100%" />
+                </div>
+                <div id="signupFields" style="display:none">
+                  <div style="margin-bottom:1rem">
+                    <label style="display:block;margin-bottom:.5rem;font-weight:600">Username</label>
+                    <input type="text" id="authUsername" placeholder="Your name" style="width:100%" />
+                  </div>
+                </div>
+                <button class="btn" style="width:100%;margin-bottom:.5rem;padding:.75rem" onclick="handleLogin()">Log In</button>
+                <button class="btn" style="width:100%;background:#667eea;margin-bottom:.5rem;padding:.75rem" onclick="toggleSignup()">Create Account</button>
+                <div style="text-align:center;font-size:.9rem;color:#6b7280;margin-top:1rem">
+                  Demo: use test@example.com / password123
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Main app interface
       renderNav();
       document.getElementById('title').textContent = tabs.find(t=>t.id===state.activeTab).label;
       const content = document.getElementById('content');
