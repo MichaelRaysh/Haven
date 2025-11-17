@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Haven Nurse App (Standalone)</title>
+  <!-- Embedded Tailwind-like utility CSS (large, offline) -->
+  <style>
+    /* Basic reset and utilities (Tailwind-like subset) */
+    *,*::before,*::after{box-sizing:border-box}
+    :root{--bg:#f7fafc;--card:#ffffff;--muted:#6b7280;--accent:#2563eb}
+    html,body{height:100%}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,\"Segoe UI\",Roboto,Arial;line-height:1.5;margin:0;background:var(--bg);color:#111}
+
+    /* Layout */
+    .container{max-width:1024px;margin-left:auto;margin-right:auto;padding-left:1rem;padding-right:1rem}
+    .flex{display:flex}
+    .inline-flex{display:inline-flex}
+    .grid{display:grid}
+    .hidden{display:none}
+    .block{display:block}
+    .items-center{align-items:center}
+    .justify-between{justify-content:space-between}
+    .justify-center{justify-content:center}
+    .gap-1{gap:.25rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}.gap-4{gap:1rem}
+
+    /* Spacing */
+    .p-0{padding:0}.p-1{padding:.25rem}.p-2{padding:.5rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}
+    .px-1{padding-left:.25rem;padding-right:.25rem}.px-2{padding-left:.5rem;padding-right:.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}
+    .py-1{padding-top:.25rem;padding-bottom:.25rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}
+    .m-0{margin:0}.m-1{margin:.25rem}.m-2{margin:.5rem}.m-3{margin:.75rem}.m-4{margin:1rem}
+    .mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-4{margin-top:1rem}
+
+    /* Widths */
+    .w-full{width:100%}.w-1\/2{width:50%}.w-1\/3{width:33.333%}.w-1\/4{width:25%}
+    .max-w-xs{max-width:20rem}
+
+    /* Sizing */
+    .h-6{height:1.5rem}
+
+    /* Typography */
+    .text-xs{font-size:.75rem}.text-sm{font-size:.875rem}.text-base{font-size:1rem}.text-lg{font-size:1.125rem}.text-xl{font-size:1.25rem}
+    .font-medium{font-weight:500}.font-semibold{font-weight:600}.font-bold{font-weight:700}
+    .text-muted{color:var(--muted)}
+
+    /* Colors and backgrounds */
+    .bg-white{background:#fff}.bg-gray-50{background:#f9fafb}.bg-blue-50{background:#eff6ff}
+    .text-blue-600{color:#2563eb}
+    .bg-accent{background:var(--accent)}.text-white{color:#fff}
+
+    /* Borders & radius */
+    .border{border:1px solid #e6edf3}.border-0{border:0}
+    .rounded{border-radius:.5rem}.rounded-full{border-radius:9999px}.rounded-sm{border-radius:.25rem}
+
+    /* Buttons & cards */
+    .btn{background:var(--accent);color:#fff;border:0;padding:.5rem .75rem;border-radius:.4rem;cursor:pointer}
+    .card{background:var(--card);padding:1rem;border-radius:.6rem;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+
+    /* Utility helpers */
+    .text-center{text-align:center}.text-right{text-align:right}
+    .inline-block{display:inline-block}
+    .overflow-auto{overflow:auto}
+    .max-h-96{max-height:24rem}
+
+    /* Grid helpers */
+    .grid-cols-4{grid-template-columns:repeat(4,1fr)}
+    .grid-cols-3{grid-template-columns:repeat(3,1fr)}
+    .grid-cols-2{grid-template-columns:repeat(2,1fr)}
+    .grid-cols-1{grid-template-columns:1fr}
+
+    /* Badges */
+    .badge{display:inline-block;background:#e6f0ff;color:#1e3a8a;padding:.2rem .5rem;border-radius:.4rem;font-size:.8rem}
+
+    /* Responsive */
+    @media (max-width:1024px){.grid-cols-4{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:640px){.grid-cols-4{grid-template-columns:1fr}}
+
+    /* Misc helpers used in the file */
+    .small{font-size:.9rem;color:var(--muted)}
+    .mt-2{margin-top:.5rem}
+    .mb-2{margin-bottom:.5rem}
+    .mb-4{margin-bottom:1rem}
+    .font-medium{font-weight:600}
+    .text-2xl{font-size:1.5rem}
+    .text-lg{font-size:1.125rem}
+    .p-6{padding:1.5rem}
+
+    /* form elements */
+    input[type=text], input[type=number], input[type=date], textarea, select{padding:.5rem;border:1px solid #e6edf3;border-radius:.4rem;width:100%}
+    video, img{max-width:100%;height:auto}
+  </style>
+  <style>
+    :root{--bg:#f7fafc;--card:#ffffff;--muted:#6b7280;--accent:#2563eb}
+    body{font-family:Inter,system-ui,Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:#111}
+    .app{display:flex;min-height:100vh}
+        .sidebar{width:260px;background:#1e293b;color:#fff;padding:1rem;box-shadow:2px 0 6px rgba(30,41,59,.2)}
+    .logo{font-weight:700;font-size:1.1rem;margin-bottom:1rem}
+    .nav{display:flex;flex-direction:column;gap:.5rem}
+    .nav button{background:transparent;border:0;color:#cbd5e1;padding:.6rem .8rem;border-radius:.5rem;text-align:left;cursor:pointer}
+    .nav button.active{background:#0b1220}
+    .main{flex:1;padding:1.25rem}
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+    .card{background:var(--card);padding:1rem;border-radius:.6rem;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+    table{width:100%;border-collapse:collapse}
+    table th,table td{padding:.5rem;text-align:left;border-bottom:1px solid #e6edf3}
+    .btn{background:var(--accent);color:#fff;border:0;padding:.45rem .75rem;border-radius:.4rem;cursor:pointer}
+    .small{font-size:.9rem;color:var(--muted)}
+    .badge{background:#e6f0ff;color:#1e3a8a;padding:.2rem .5rem;border-radius:.4rem;font-size:.8rem}
+    .flex{display:flex;gap:.5rem;align-items:center}
+    .mt-2{margin-top:.5rem}
+    /* Responsive tweaks */
+    @media (max-width: 768px) {
+      .app{flex-direction:column}
+      .sidebar{position:fixed;left:-100%;top:0;height:100%;z-index:40;transition:left .2s;width:260px}
+      .sidebar.open{left:0}
+      .main{margin-left:0;padding:1rem}
+      .header{position:sticky;top:0;background:var(--card);z-index:20;padding:.5rem}
+      .grid{grid-template-columns:1fr}
+      .card{margin-bottom:.75rem}
+      .nav{flex-direction:column}
+      .nav button{width:100%;text-align:left}
+      canvas{width:100% !important;height:200px !important}
+      .btn{padding:.6rem 1rem}
+      #hamburger{display:inline-block}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">Haven — Nurse App</div>
+      <div class="nav" id="nav"></div>
+      <div style="margin-top:1rem;font-size:.85rem;color:#94a3b8">Signed in as <span id="userLabel">Guest</span></div>
+    </aside>
+    <main class="main">
+      <div class="header">
+        <button id="hamburger" onclick="toggleSidebar()" style="display:none;margin-right:.5rem;background:transparent;border:0;color:var(--muted);font-size:1.2rem">☰</button>
+        <h1 id="title">Dashboard</h1>
+        <div class="flex"><button class="btn" id="refreshBtn">Refresh</button></div>
+      </div>
+      <div id="content"></div>
+    </main>
+  </div>
+
+  <script>
+    // Minimal standalone app state
+    const today = '2025-11-13';
+    const state = {
+      currentUser: { username: 'nurse_sarah' },
+      activeTab: 'dashboard',
+      patients: [
+        { id: 1, name: 'John Doe', age: 82, allergies: 'Penicillin', conditions: 'HTN', lastVisit: '2025-11-10' },
+        { id: 2, name: 'Jane Smith', age: 73, allergies: 'None', conditions: 'COPD', lastVisit: '2025-11-09' },
+        { id: 3, name: 'Bob Johnson', age: 86, allergies: 'Sulfa', conditions: 'Heart Disease', lastVisit: '2025-11-08' }
+      ],
+      medications: [
+        { id:1, patient:'John Doe', drug:'Lisinopril', dosage:'10mg', frequency:'Once daily', status:'on-time' },
+        { id:2, patient:'Jane Smith', drug:'Metformin', dosage:'500mg', frequency:'Twice daily', status:'due-soon' }
+      ],
+      appointments: [
+        { id:1, patient:'John Doe', date:'2025-11-12', time:'10:00 AM', type:'Wound Care', address:'123 Main St' },
+        { id:2, patient:'Jane Smith', date:'2025-11-12', time:'3:00 PM', type:'Medication Review', address:'456 Oak Ave' }
+      ],
+      messages: [
+        { id:1, from:'Dr. Chen', to:'You', message:'Please check John Doe', time:'9:30 AM', read:false }
+      ],
+      alerts: [
+        { id:1, priority:'high', message:'Medication due for John Doe - Lisinopril 10mg', time:'2 hours ago' }
+      ],
+      notes: [
+        { id:1, author:'nurse_sarah', patient:'John Doe', title:'BP Check', content:'BP 145/90', category:'vital-signs', timestamp:'2025-11-13 09:30' },
+        { id:2, author:'admin_john', patient:'Jane Smith', title:'Medication Compliance', content:'Missed morning dose', category:'medication', timestamp:'2025-11-12 14:15' },
+        { id:3, author:'nurse_mary', patient:'Bob Johnson', title:'Wound Assessment', content:'Healing well', category:'care', timestamp:'2025-11-12 11:00' }
+      ],
+      noteFilter: 'all',
+      isAddingNote: false,
+      newNote: { patient:'', title:'', content:'', category:'general' },
+      signature: null,
+      isDrawing: false,
+      capturedPhoto: null,
+      cameraActive: false,
+      isRecording: false,
+      voiceNotes: [],
+      auditLog: [],
+      mileageEnabled: false,
+      mileageTrips: [
+        { id:1, date:'2025-11-13', patient:'John Doe', startAddress:'Office - 100 Main St', endAddress:'123 Main St', miles:2.3, duration:'8 mins', purpose:'Wound Care', reimbursable: true },
+        { id:2, date:'2025-11-13', patient:'Jane Smith', startAddress:'123 Main St', endAddress:'456 Oak Ave', miles:4.1, duration:'12 mins', purpose:'Medication Review', reimbursable: true }
+      ],
+      newTrip: { patient:'', startAddress:'', endAddress:'', miles:0, duration:'', purpose:'' },
+      showAddTrip: false
+    };
+
+    const tabs = [
+      { id:'dashboard', label:'Dashboard' },
+      { id:'notes', label:'Clinical Notes' },
+      { id:'patients', label:'Patient Records' },
+      { id:'medications', label:'Medications' },
+      { id:'appointments', label:'Appointments' },
+      { id:'messages', label:'Secure Messaging' },
+      { id:'capture', label:'Photo Capture' },
+      { id:'signature', label:'E-Signature' },
+      { id:'voice', label:'Voice Notes' },
+      { id:'mileage', label:'Travel Mileage' },
+      { id:'alerts', label:'Alerts' },
+      { id:'audit', label:'Audit Log' }
+    ];
+
+    function renderNav(){
+      const nav = document.getElementById('nav');
+      nav.innerHTML = tabs.map(t=>`<button class="${t.id===state.activeTab? 'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`).join('');
+      document.getElementById('userLabel').textContent = state.currentUser?.username || 'Guest';
+    }
+
+    function toggleSidebar(){
+      const sb = document.querySelector('.sidebar');
+      if(!sb) return;
+      sb.classList.toggle('open');
+    }
+
+    function setTab(id){ state.activeTab = id; render(); }
+
+    function render(){
+      renderNav();
+      document.getElementById('title').textContent = tabs.find(t=>t.id===state.activeTab).label;
+      const content = document.getElementById('content');
+      if(state.activeTab==='dashboard'){
+        content.innerHTML = `
+          <div class="grid">
+            <div class="card"><div class="small">Patients</div><div style="font-weight:700;font-size:1.4rem">${state.patients.length}</div></div>
+            <div class="card"><div class="small">Notes</div><div style="font-weight:700;font-size:1.4rem">${state.notes.length}</div></div>
+            <div class="card"><div class="small">Trips</div><div style="font-weight:700;font-size:1.4rem">${state.mileageTrips.length}</div></div>
+            <div class="card"><div class="small">Reimbursement</div><div style="font-weight:700;font-size:1.4rem">$${(state.mileageTrips.reduce((s,t)=>s+t.miles,0)*0.67).toFixed(2)}</div></div>
+          </div>
+          <div class="mt-2 card"><h3>Recent Notes</h3>${state.notes.slice(0,3).map(n=>`<div style="padding:.5rem 0;border-top:1px solid #eef"> <div style="font-weight:600">${n.title} <span class=\"small\">(${n.patient})</span></div><div class=\"small\">${n.content}</div></div>`).join('')}</div>
+        `;
+      } else if(state.activeTab==='notes'){
+        content.innerHTML = `
+          <div class="card mb-2">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem"><div style="font-weight:700">Clinical Notes</div><div><button class="btn" onclick="state.isAddingNote = !state.isAddingNote; render();">${state.isAddingNote? 'Close':'Add Note'}</button></div></div>
+            <div style="margin-bottom:.5rem"><label class="small">Filter by category</label><br>
+            <select onchange="state.noteFilter=this.value; render();"><option value="all">All</option><option value="vital-signs">Vital Signs</option><option value="medication">Medication</option><option value="care">Care</option><option value="general">General</option></select></div>
+            ${state.isAddingNote? `
+              <div style="margin-top:.5rem">
+                <select onchange="state.newNote.patient=this.value"><option value="">Select Patient</option>${state.patients.map(p=>`<option value=\"${p.name}\">${p.name}</option>`).join('')}</select>
+                <input type="text" placeholder="Title" style="width:100%;margin-top:.5rem" onchange="state.newNote.title=this.value" />
+                <textarea placeholder="Note" style="width:100%;margin-top:.5rem" onchange="state.newNote.content=this.value"></textarea>
+                <select style="margin-top:.5rem" onchange="state.newNote.category=this.value"><option value="general">General</option><option value="vital-signs">Vital Signs</option><option value="medication">Medication</option><option value="care">Care</option></select>
+                <div class="flex mt-2"><button class="btn" onclick="saveNote()">Save</button><button class="btn" style="background:#6b7280;margin-left:.5rem" onclick="state.isAddingNote=false; render();">Cancel</button></div>
+              </div>
+            `:''}
+          </div>
+          <div class="card">
+            ${filteredNotesHTML()}
+          </div>
+        `;
+      } else if(state.activeTab==='signature'){
+        content.innerHTML = `
+          <div class="card"><h3>E-Signature</h3>
+            <canvas id="sigCanvas" style="border:1px solid #e6edf3;border-radius:.4rem;touch-action: none;margin-top:.5rem;width:100%;height:200px;"></canvas>
+            <div class="flex mt-2"><button class="btn" onclick="saveSignature()">Save</button><button class="btn" style="background:#6b7280" onclick="clearSignature()">Clear</button></div>
+            <div id="sigPreview" class="mt-2"></div>
+          </div>
+        `;
+        setupCanvas();
+      } else if(state.activeTab==='mileage'){
+        content.innerHTML = `
+          <div class="card mb-4">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem"><div style="font-weight:700">Travel & Mileage</div><div style="display:flex;align-items:center;gap:.5rem"><label style="display:flex;align-items:center;cursor:pointer"><input type="checkbox" ${state.mileageEnabled? 'checked':''} onchange="state.mileageEnabled=this.checked; logAudit('MILEAGE_TRACKING', this.checked? 'enabled':'disabled'); render();" /><span style="margin-left:.5rem;font-size:.9rem\">Enable Tracking</span></label></div></div>
+          </div>
+          ${!state.mileageEnabled ? `
+            <div class="card" style="text-align:center;padding:3rem 1rem">
+              <div style="font-size:3rem;margin-bottom:1rem">🚗</div>
+              <h3 style="font-weight:600;margin-bottom:.5rem">Mileage Tracking Disabled</h3>
+              <p class="small" style="margin-bottom:1rem">Enable to log trips for reimbursement</p>
+              <button class="btn" onclick="state.mileageEnabled=true; render();">Enable Tracking</button>
+            </div>
+          ` : `
+            <div class="grid grid-cols-4 gap-2" style="margin-bottom:1.5rem">
+              <div class="card"><div class="small">Total Miles</div><div style="font-weight:700;font-size:1.4rem">${state.mileageTrips.reduce((s,t)=>s+t.miles,0).toFixed(1)}</div></div>
+              <div class="card"><div class="small">Total Trips</div><div style="font-weight:700;font-size:1.4rem">${state.mileageTrips.length}</div></div>
+              <div class="card"><div class="small">Reimbursement</div><div style="font-weight:700;font-size:1.4rem">$${(state.mileageTrips.reduce((s,t)=>s+t.miles,0)*0.67).toFixed(2)}</div></div>
+              <div class="card"><div class="small\">Drive Time</div><div style="font-weight:700;font-size:1.4rem\">${state.mileageTrips.reduce((s,t)=>{let p=t.duration.match(/\\d+/); return s+(p ? parseInt(p[0]):0);},0)}m</div></div>
+            </div>
+            <div class="card mb-4">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem"><div style="font-weight:700">Add Trip</div><div><button class="btn" onclick="state.showAddTrip = !state.showAddTrip; render();">${state.showAddTrip? 'Hide':'Add Trip'}</button></div></div>
+              ${state.showAddTrip? `
+                <div style="margin-top:.5rem">
+                  <select onchange="state.newTrip.patient=this.value"><option value="">Select Patient</option>${state.patients.map(p=>`<option value=\"${p.name}\">${p.name}</option>`).join('')}</select>
+                  <input placeholder="Start Address" style="width:100%;margin-top:.5rem" onchange="state.newTrip.startAddress=this.value" />
+                  <input placeholder="End Address" style="width:100%;margin-top:.5rem" onchange="state.newTrip.endAddress=this.value" />
+                  <input type="number" step="0.1" placeholder="Miles" style="width:100%;margin-top:.5rem" onchange="state.newTrip.miles=parseFloat(this.value)" />
+                  <input placeholder="Duration (e.g., 12 mins)" style="width:100%;margin-top:.5rem" onchange="state.newTrip.duration=this.value" />
+                  <input placeholder="Purpose" style="width:100%;margin-top:.5rem" onchange="state.newTrip.purpose=this.value" />
+                  <div class="flex mt-2"><button class="btn" onclick="addTrip()">Save Trip</button><button class="btn" style="background:#6b7280;margin-left:.5rem" onclick="state.showAddTrip=false; render();">Cancel</button></div>
+                </div>
+              `:''}
+            </div>
+            <div class="card">
+              <h3>Trip History</h3>
+              ${state.mileageTrips.length===0? '<div class="small">No trips recorded</div>' : state.mileageTrips.map(t=>`<div style="padding:.5rem 0;border-top:1px solid #eef"><div style="font-weight:600">${t.patient} <span class=\"small\">${t.date}</span></div><div class=\"small\">${t.startAddress} → ${t.endAddress} • ${t.miles} mi • ${t.duration} • $${(t.miles*0.67).toFixed(2)}</div></div>`).join('')}
+            </div>
+          `}
+        `;
+      } else if(state.activeTab==='patients'){
+        content.innerHTML = `
+          <div class="card mb-4"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">Patient Records</div><div><button class="btn" onclick="document.getElementById('addPatientForm').style.display = document.getElementById('addPatientForm').style.display === 'block' ? 'none' : 'block'">Add Patient</button></div></div>
+            <div id="addPatientForm" style="display:none;margin-top:.5rem">
+              <input id="pa-name" placeholder="Full name" style="width:100%;margin-top:.5rem" />
+              <input id="pa-dob" type="date" style="width:100%;margin-top:.5rem" />
+              <input id="pa-allergies" placeholder="Allergies" style="width:100%;margin-top:.5rem" />
+              <input id="pa-conditions" placeholder="Conditions" style="width:100%;margin-top:.5rem" />
+              <div class="flex mt-2"><button class="btn" onclick="addPatient()">Save Patient</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <table><thead><tr><th>Name</th><th>Age</th><th>Allergies</th><th>Conditions</th></tr></thead><tbody>${state.patients.map(p=>`<tr><td class=\"font-medium\">${p.name}</td><td>${p.age}</td><td>${p.allergies}</td><td>${p.conditions}</td></tr>`).join('')}</tbody></table>
+          </div>
+        `;
+      } else if(state.activeTab==='medications'){
+        content.innerHTML = `
+          <div class="card mb-4"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">Medications</div><div><button class="btn" onclick="document.getElementById('addMedForm').style.display = document.getElementById('addMedForm').style.display === 'block' ? 'none' : 'block'">Add Medication</button></div></div>
+            <div id="addMedForm" style="display:none;margin-top:.5rem">
+              <select id="med-patient">${state.patients.map(p=>`<option value=\"${p.name}\">${p.name}</option>`).join('')}</select>
+              <input id="med-drug" placeholder="Drug name" style="width:100%;margin-top:.5rem" />
+              <input id="med-dosage" placeholder="Dosage" style="width:100%;margin-top:.5rem" />
+              <input id="med-frequency" placeholder="Frequency" style="width:100%;margin-top:.5rem" />
+              <div class="flex mt-2"><button class="btn" onclick="addMedication()">Save</button></div>
+            </div>
+          </div>
+          <div class="card">
+            <table><thead><tr><th>Patient</th><th>Medication</th><th>Dosage</th><th>Frequency</th><th>Status</th></tr></thead><tbody>${state.medications.map(m=>`<tr><td class=\"font-medium\">${m.patient}</td><td>${m.drug}</td><td>${m.dosage}</td><td>${m.frequency}</td><td>${m.status}</td></tr>`).join('')}</tbody></table>
+          </div>
+        `;
+      } else if(state.activeTab==='appointments'){
+        content.innerHTML = `
+          <h2 class="text-2xl font-bold mb-6">Appointments</h2>
+          <div class="space-y-4">${state.appointments.map(a=>`<div class=\"card\"><div class=\"flex items-center justify-between\"><div><div class=\"font-medium\">${a.patient}</div><div class=\"small\">${a.type}</div></div><div class=\"text-right\"><div class=\"small\">${a.date}</div><div class=\"small\">${a.time}</div></div></div></div>`).join('')}</div>`;
+      } else if(state.activeTab==='messages'){
+        content.innerHTML = `
+          <div class="card"><h3>Secure Messaging</h3>
+            <div style="max-height:320px;overflow:auto;margin-bottom:.5rem">${state.messages.map(m=>`<div style=\"padding:.5rem;border-bottom:1px solid #eef\"><div class=\"flex\"><strong>${m.from}</strong><span class=\"small\" style=\"margin-left:.5rem;color:#64748b\">→ ${m.to}</span></div><div class=\"small\">${m.message}</div><div class=\"small\">${m.time}</div></div>`).join('')}</div>
+            <div class=\"flex\"><input id=\"msg-input\" placeholder=\"Type message...\" style=\"flex:1;padding:.5rem;border:1px solid #e6edf3;border-radius:.4rem\" /><button class=\"btn\" style=\"margin-left:.5rem\" onclick=\"sendMsg()\">Send</button></div>
+          </div>
+        `;
+      } else if(state.activeTab==='capture'){
+        content.innerHTML = `
+          <div class=\"card\"><h3>Photo Capture</h3>
+            ${!state.cameraActive && !state.capturedPhoto ? `
+              <div class=\"text-center py-12\"><div style=\"font-size:3rem;margin-bottom:1rem\">📷</div><button class=\"btn\" onclick=\"startCamera()\">Start Camera</button></div>
+            ` : state.cameraActive ? `
+              <video id=\"videoStream\" autoplay playsinline style=\"width:100%;min-height:200px;margin-bottom:1rem\"></video>
+              <div class=\"flex\"><button class=\"btn\" onclick=\"capturePhoto()\">Capture</button><button class=\"btn\" style=\"background:#6b7280;margin-left:.5rem\" onclick=\"stopCamera()\">Stop</button></div>
+            ` : `
+              <img src=\"${state.capturedPhoto}\" alt=\"Captured\" style=\"width:100%;border-radius:.4rem;margin-bottom:1rem\" />
+              <div class=\"flex\"><button class=\"btn\" onclick=\"state.capturedPhoto=null; render();\">Retake</button></div>
+            `}
+          </div>
+        `;
+      } else if(state.activeTab==='voice'){
+        content.innerHTML = `
+          <div class=\"card\"><h3>Voice Notes</h3>
+            <div class=\"flex\"><button class=\"btn\" onclick=\"startRecording()\">Record</button><button class=\"btn\" style=\"background:#6b7280;margin-left:.5rem\" onclick=\"stopRecording()\">Stop</button></div>
+            <div style=\"margin-top:.75rem\">${state.voiceNotes.length===0? '<div class=\"small\">No recordings</div>' : state.voiceNotes.map(v=>`<div style=\"padding:.5rem 0;border-top:1px solid #eef\"><audio controls src=\"${v.url}\"></audio><div class=\"small\">${v.timestamp}</div></div>`).join('')}</div>
+          </div>
+        `;
+      } else if(state.activeTab==='alerts'){
+        content.innerHTML = `
+          <div class=\"card\"><h3>Alerts & Notifications</h3>
+            ${state.alerts.map(a=>`<div style=\"padding:.6rem 0;border-top:1px solid #eef\"><div class=\"flex\" style=\"justify-content:space-between\"><div><strong>${a.priority.toUpperCase()}</strong> <div class=\"small\">${a.message}</div></div><div><button class=\"btn\" onclick=\"ackAlert(${a.id})\">Acknowledge</button></div></div></div>`).join('')}
+          </div>
+        `;
+      } else if(state.activeTab==='audit'){
+        content.innerHTML = `
+          <div class=\"card\"><h3>Audit Log</h3>
+            <table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody>${state.auditLog.length===0? '<tr><td colspan=\"4\" class=\"small\">No audit logs</td></tr>' : state.auditLog.map(e=>`<tr><td class=\"small\">${new Date(e.timestamp).toLocaleString()}</td><td>${e.user}</td><td>${e.action}</td><td>${e.details}</td></tr>`).join('')}</tbody></table>
+          </div>
+        `;
+      }
+    }
+
+    function filteredNotesHTML(){
+      const list = state.notes.filter(n => state.noteFilter==='all' || n.category===state.noteFilter);
+      if(!list.length) return '<div class="small">No notes</div>';
+      return list.map(n=>`<div style="padding:.6rem 0;border-top:1px solid #eef"><div style="font-weight:600">${n.title} <span class=\"small\">(${n.patient})</span> <span class=\"badge\">${n.category}</span></div><div class=\"small\">${n.content}</div><div class=\"small mt-2\">${n.timestamp}</div></div>`).join('');
+    }
+
+    function saveNote(){
+      if(!state.newNote.patient || !state.newNote.title || !state.newNote.content) { alert('Please fill all fields'); return; }
+      state.notes.unshift({ id: state.notes.length+1, patient: state.newNote.patient, title: state.newNote.title, content: state.newNote.content, category: state.newNote.category || 'general', timestamp: new Date().toISOString().replace('T',' ').slice(0,16) });
+      state.newNote = { patient:'', title:'', content:'', category:'general' };
+      state.isAddingNote = false;
+      render();
+    }
+
+    function addTrip(){
+      const t = state.newTrip;
+      if(!t.patient || !t.startAddress || !t.endAddress || !t.miles) { alert('Fill trip required fields'); return; }
+      state.mileageTrips.unshift({ id: state.mileageTrips.length+1, date: today, patient: t.patient, startAddress: t.startAddress, endAddress: t.endAddress, miles: parseFloat(t.miles), duration: t.duration || '0 mins', purpose: t.purpose || '' });
+      state.newTrip = { patient:'', startAddress:'', endAddress:'', miles:0, duration:'', purpose:'' };
+      state.showAddTrip = false;
+      render();
+    }
+
+    // Helper functions: patients, meds, messages, camera, recording, alerts, audit
+    function addPatient(){
+      const name = document.getElementById('pa-name').value;
+      const dob = document.getElementById('pa-dob').value;
+      const allergies = document.getElementById('pa-allergies').value;
+      const conditions = document.getElementById('pa-conditions').value;
+      if(!name || !dob){ alert('Please fill name and DOB'); return; }
+      const age = new Date().getFullYear() - new Date(dob).getFullYear();
+      state.patients.unshift({ id: state.patients.length+1, name, dob, age, allergies, conditions, lastVisit: new Date().toISOString().split('T')[0] });
+      logAudit('PATIENT_ADDED', `Added patient ${name}`);
+      render();
+    }
+
+    function addMedication(){
+      const patient = document.getElementById('med-patient').value;
+      const drug = document.getElementById('med-drug').value;
+      const dosage = document.getElementById('med-dosage').value;
+      const frequency = document.getElementById('med-frequency').value;
+      if(!patient || !drug) { alert('Please fill required fields'); return; }
+      state.medications.unshift({ id: state.medications.length+1, patient, drug, dosage, frequency, status: 'on-time' });
+      logAudit('MEDICATION_ADDED', `Added ${drug} for ${patient}`);
+      render();
+    }
+
+    function sendMsg(){
+      const input = document.getElementById('msg-input');
+      if(!input || !input.value.trim()) return; const msg = input.value.trim();
+      state.messages.unshift({ id: state.messages.length+1, from: state.currentUser.username, to: 'Team', message: msg, time: new Date().toLocaleTimeString(), read:false });
+      logAudit('MESSAGE_SENT', msg);
+      if(input) input.value = '';
+      render();
+    }
+
+    let _videoStream = null;
+    function startCamera(){
+      navigator.mediaDevices.getUserMedia({ video:true }).then(stream=>{
+        _videoStream = stream; state.cameraActive = true; render();
+        const v = document.getElementById('videoStream'); if(v) v.srcObject = stream;
+        logAudit('CAMERA_STARTED', 'Camera started');
+      }).catch(()=>alert('Camera access denied'));
+    }
+    function capturePhoto(){
+      const v = document.getElementById('videoStream'); if(!v) return; const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; c.getContext('2d').drawImage(v,0,0); state.capturedPhoto = c.toDataURL('image/jpeg'); stopCamera(); logAudit('PHOTO_CAPTURED','Photo captured'); render();
+    }
+    function stopCamera(){ if(_videoStream){ _videoStream.getTracks().forEach(t=>t.stop()); _videoStream=null; } state.cameraActive=false; render(); }
+
+    let _mediaRecorder = null; let _chunks = [];
+    function startRecording(){
+      navigator.mediaDevices.getUserMedia({ audio:true }).then(stream=>{
+        _mediaRecorder = new MediaRecorder(stream);
+        _chunks = [];
+        _mediaRecorder.ondataavailable = e=>_chunks.push(e.data);
+        _mediaRecorder.onstop = ()=>{ const blob = new Blob(_chunks,{type:'audio/webm'}); const url = URL.createObjectURL(blob); state.voiceNotes.unshift({ url, timestamp: new Date().toLocaleString() }); logAudit('VOICE_NOTE', 'Recorded voice note'); render(); };
+        _mediaRecorder.start(); state.isRecording = true; render();
+      }).catch(()=>alert('Microphone access denied'));
+    }
+    function stopRecording(){ if(_mediaRecorder && _mediaRecorder.state !== 'inactive'){ _mediaRecorder.stop(); _mediaRecorder.stream.getTracks().forEach(t=>t.stop()); _mediaRecorder = null; state.isRecording=false; render(); } }
+
+    function ackAlert(id){ state.alerts = state.alerts.filter(a=>a.id!==id); logAudit('ALERT_ACK', `Acknowledged ${id}`); render(); }
+
+    function logAudit(action, details){ state.auditLog.unshift({ timestamp: new Date().toISOString(), user: state.currentUser?.username || 'Unknown', action, details }); }
+
+    // Signature canvas helpers with touch support
+    function setupCanvas(){
+      const canvas = document.getElementById('sigCanvas');
+      if(!canvas) return;
+
+      // Resize canvas for high-DPI and responsive width
+      function resizeCanvas(){
+        const dpr = window.devicePixelRatio || 1;
+        const cssWidth = canvas.clientWidth || 600;
+        const cssHeight = 200;
+        canvas.width = Math.max(300, Math.floor(cssWidth * dpr));
+        canvas.height = Math.floor(cssHeight * dpr);
+        canvas.style.height = cssHeight + 'px';
+        const ctx = canvas.getContext('2d');
+        ctx.setTransform(1,0,0,1,0,0);
+        ctx.scale(dpr, dpr);
+        ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#111';
+      }
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      const ctx = canvas.getContext('2d');
+      let drawing = false;
+
+      function getXY(e){
+        const rect = canvas.getBoundingClientRect();
+        const clientX = (e.clientX !== undefined) ? e.clientX : (e.touches && e.touches[0] && e.touches[0].clientX);
+        const clientY = (e.clientY !== undefined) ? e.clientY : (e.touches && e.touches[0] && e.touches[0].clientY);
+        return { x: clientX - rect.left, y: clientY - rect.top };
+      }
+
+      function start(e){ e.preventDefault(); drawing = true; const p=getXY(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }
+      function move(e){ if(!drawing) return; e.preventDefault(); const p=getXY(e); ctx.lineTo(p.x,p.y); ctx.stroke(); }
+      function end(e){ if(!drawing) return; drawing=false; }
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', end);
+      canvas.addEventListener('touchstart', start, {passive:false});
+      canvas.addEventListener('touchmove', move, {passive:false});
+      canvas.addEventListener('touchend', end);
+
+      // expose save/clear
+      window.saveSignature = function(){ const data = canvas.toDataURL(); state.signature = data; document.getElementById('sigPreview').innerHTML = `<img src="${data}" style="max-width:320px;border:1px solid #eef;border-radius:.4rem"/>`; };
+      window.clearSignature = function(){ ctx.clearRect(0,0,canvas.width,canvas.height); state.signature = null; document.getElementById('sigPreview').innerHTML = ''; };
+    }
+
+    document.getElementById('refreshBtn').addEventListener('click', ()=>render());
+
+    // Initial render
+    render();
+  </script>
+</body>
+</html>
