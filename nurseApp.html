@@ -161,6 +161,34 @@
     
     // Global auth state
     let currentSession = null;
+    let inactivityTimer = null;
+    const INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes in milliseconds
+    
+    // Password validation regex
+    const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    
+    function validatePassword(password) {
+      if (password.length < 8) return 'Password must be at least 8 characters';
+      if (!/[a-z]/.test(password)) return 'Password must contain lowercase letters';
+      if (!/[A-Z]/.test(password)) return 'Password must contain uppercase letters';
+      if (!/\d/.test(password)) return 'Password must contain numbers';
+      if (!/[@$!%*?&]/.test(password)) return 'Password must contain special characters (@$!%*?&)';
+      return null;
+    }
+    
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      if (!currentSession) return;
+      
+      inactivityTimer = setTimeout(() => {
+        logout('Session expired due to inactivity');
+      }, INACTIVITY_TIMEOUT);
+    }
+    
+    // Track user activity
+    document.addEventListener('mousemove', resetInactivityTimer);
+    document.addEventListener('keypress', resetInactivityTimer);
+    document.addEventListener('click', resetInactivityTimer);
     
     // App state
     const today = '2025-11-13';
@@ -196,7 +224,18 @@
         if (error) throw error;
         currentSession = data.session;
         state.currentUser = { id: data.user.id, email: data.user.email };
+        
+        // Check if email is verified
+        if (!data.user.email_confirmed_at) {
+          alert('Please verify your email before logging in. Check your inbox for the verification link.');
+          await client.auth.signOut();
+          currentSession = null;
+          render();
+          return;
+        }
+        
         await loadUserData();
+        resetInactivityTimer(); // Start inactivity timer
         render();
       } catch (error) {
         alert('Login failed: ' + error.message);
@@ -205,31 +244,55 @@
 
     async function signup(email, password, username) {
       try {
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert('Please enter a valid email address');
+          return;
+        }
+        
+        // Validate password strength
+        const passwordError = validatePassword(password);
+        if (passwordError) {
+          alert('Password requirements: ' + passwordError);
+          return;
+        }
+        
+        if (!username || username.length < 2) {
+          alert('Username must be at least 2 characters');
+          return;
+        }
+        
         const { data, error } = await client.auth.signUp({ email, password });
         if (error) throw error;
         
-        // Create user profile in database
-        const { error: profileError } = await client
-          .from('profiles')
-          .insert({ id: data.user.id, email, username });
-        
-        if (profileError) throw profileError;
-        
+        // User created but needs email verification
         currentSession = data.session;
         state.currentUser = { id: data.user.id, email, username };
-        await loadUserData();
+        
+        // Show verification message
+        alert('Account created! Please check your email to verify your account before logging in.');
+        
+        // Clear the form
+        document.getElementById('authEmail').value = '';
+        document.getElementById('authPassword').value = '';
+        document.getElementById('authUsername').value = '';
+        isSignupMode = false;
+        
         render();
       } catch (error) {
         alert('Signup failed: ' + error.message);
       }
     }
 
-    async function logout() {
+    async function logout(message) {
       try {
         await client.auth.signOut();
         currentSession = null;
         state.currentUser = null;
         state.activeTab = 'dashboard';
+        clearTimeout(inactivityTimer);
+        if (message) alert(message);
         render();
       } catch (error) {
         alert('Logout failed: ' + error.message);
@@ -376,7 +439,9 @@
     function toggleSignup() {
       isSignupMode = !isSignupMode;
       const fields = document.getElementById('signupFields');
+      const requirements = document.getElementById('passwordRequirements');
       if (fields) fields.style.display = isSignupMode ? 'block' : 'none';
+      if (requirements) requirements.style.display = isSignupMode ? 'block' : 'none';
       const btn = event.target;
       btn.textContent = isSignupMode ? 'Back to Login' : 'Create Account';
       if (isSignupMode) {
@@ -459,6 +524,14 @@
                 <div style="margin-bottom:1rem">
                   <label style="display:block;margin-bottom:.5rem;font-weight:600">Password</label>
                   <input type="password" id="authPassword" placeholder="••••••••" style="width:100%" />
+                  <div id="passwordRequirements" style="display:none;background:#f0f4ff;padding:.75rem;border-radius:.4rem;margin-top:.5rem;font-size:.85rem;color:#3730a3">
+                    <div style="font-weight:600;margin-bottom:.5rem">Password must contain:</div>
+                    <div style="margin:.25rem 0">✓ At least 8 characters</div>
+                    <div style="margin:.25rem 0">✓ Uppercase letter (A-Z)</div>
+                    <div style="margin:.25rem 0">✓ Lowercase letter (a-z)</div>
+                    <div style="margin:.25rem 0">✓ Number (0-9)</div>
+                    <div style="margin:.25rem 0">✓ Special character (@$!%*?&)</div>
+                  </div>
                 </div>
                 <div id="signupFields" style="display:none">
                   <div style="margin-bottom:1rem">
@@ -468,8 +541,11 @@
                 </div>
                 <button class="btn" style="width:100%;margin-bottom:.5rem;padding:.75rem" onclick="handleLogin()">Log In</button>
                 <button class="btn" style="width:100%;background:#667eea;margin-bottom:.5rem;padding:.75rem" onclick="toggleSignup()">Create Account</button>
-                <div style="text-align:center;font-size:.9rem;color:#6b7280;margin-top:1rem">
-                  Demo: use test@example.com / password123
+                <div style="text-align:center;font-size:.85rem;color:#6b7280;margin-top:1rem;line-height:1.6">
+                  <strong>🔒 Security Features:</strong><br>
+                  • Email verification required<br>
+                  • Strong password policy<br>
+                  • Auto-logout after 30 min inactivity
                 </div>
               </div>
             </div>
