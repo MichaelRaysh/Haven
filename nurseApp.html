@@ -442,13 +442,10 @@
       const requirements = document.getElementById('passwordRequirements');
       if (fields) fields.style.display = isSignupMode ? 'block' : 'none';
       if (requirements) requirements.style.display = isSignupMode ? 'block' : 'none';
-      const btn = event.target;
-      btn.textContent = isSignupMode ? 'Back to Login' : 'Create Account';
-      if (isSignupMode) {
-        document.querySelector('button.btn').textContent = 'Sign Up';
-      } else {
-        document.querySelector('button.btn').textContent = 'Log In';
-      }
+      const btn = (typeof event !== 'undefined' && event && event.target) ? event.target : document.querySelector('.create-account-btn');
+      if (btn) btn.textContent = isSignupMode ? 'Back to Login' : 'Create Account';
+      const primaryBtn = document.querySelector('button.btn');
+      if (primaryBtn) primaryBtn.textContent = isSignupMode ? 'Sign Up' : 'Log In';
     }
     
     function handleLogin() {
@@ -475,9 +472,14 @@
     // ===== HELPER FUNCTIONS =====
     function renderNav(){
       const nav = document.getElementById('nav');
-      if (nav) nav.innerHTML = tabs.map(t=>`<button class="${t.id===state.activeTab? 'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`).join('');
+      if (nav) {
+        nav.innerHTML = tabs.map(t => `<button class="${t.id===state.activeTab? 'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`).join('');
+      }
+
       const userLabel = document.getElementById('userLabel');
-      if (userLabel) userLabel.textContent = state.currentUser?.email?.split('@')[0] || 'User';
+      if (userLabel) {
+        userLabel.textContent = state.currentUser?.email?.split('@')[0] || 'User';
+      }
     }
 
     function logAudit(action, details) {
@@ -492,12 +494,6 @@
     }
 
     function setTab(id){ state.activeTab = id; render(); }
-
-    function renderNav(){
-      const nav = document.getElementById('nav');
-      nav.innerHTML = tabs.map(t=>`<button class="${t.id===state.activeTab? 'active':''}" onclick="setTab('${t.id}')">${t.label}</button>`).join('');
-      document.getElementById('userLabel').textContent = state.currentUser?.email?.split('@')[0] || 'User';
-    }
 
     function toggleSidebar(){
       const sb = document.querySelector('.sidebar');
@@ -540,7 +536,7 @@
                   </div>
                 </div>
                 <button class="btn" style="width:100%;margin-bottom:.5rem;padding:.75rem" onclick="handleLogin()">Log In</button>
-                <button class="btn" style="width:100%;background:#667eea;margin-bottom:.5rem;padding:.75rem" onclick="toggleSignup()">Create Account</button>
+                <button class="btn create-account-btn" style="width:100%;background:#667eea;margin-bottom:.5rem;padding:.75rem" onclick="toggleSignup()">Create Account</button>
                 <div style="text-align:center;font-size:.85rem;color:#6b7280;margin-top:1rem;line-height:1.6">
                   <strong>🔒 Security Features:</strong><br>
                   • Email verification required<br>
@@ -556,8 +552,12 @@
 
       // Main app interface
       renderNav();
-      document.getElementById('title').textContent = tabs.find(t=>t.id===state.activeTab).label;
+      const titleEl = document.getElementById('title');
+      if (titleEl) titleEl.textContent = tabs.find(t=>t.id===state.activeTab).label;
       const content = document.getElementById('content');
+      if (!content) {
+        return; // Nothing to render into yet
+      }
       if(state.activeTab==='dashboard'){
         content.innerHTML = `
           <div class="grid">
