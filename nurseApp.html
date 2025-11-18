@@ -7,7 +7,126 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb; color: #1f2937; }
-        /* ...full CSS from your file... */
+        .min-h-screen { min-height: 100vh; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-1 { flex: 1; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .w-full { width: 100%; }
+        .w-16 { width: 4rem; }
+        .w-12 { width: 3rem; }
+        .w-10 { width: 2.5rem; }
+        .h-16 { height: 4rem; }
+        .h-12 { height: 3rem; }
+        .h-10 { height: 2.5rem; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+        .py-12 { padding-top: 3rem; padding-bottom: 3rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .border { border: 1px solid #e5e7eb; }
+        .border-2 { border: 2px solid #e5e7eb; }
+        .border-b { border-bottom: 1px solid #e5e7eb; }
+        .border-t { border-top: 1px solid #e5e7eb; }
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+        .bg-white { background-color: white; }
+        .bg-gray-50 { background-color: #f9fafb; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .bg-blue-100 { background-color: #dbeafe; }
+        .bg-blue-50 { background-color: #eff6ff; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .bg-teal-600 { background-color: #0d9488; }
+        .bg-teal-700 { background-color: #0f766e; }
+        .bg-red-600 { background-color: #dc2626; }
+        .bg-red-100 { background-color: #fee2e2; }
+        .bg-green-50 { background-color: #f0fdf4; }
+        .bg-green-100 { background-color: #dcfce7; }
+        .bg-green-600 { background-color: #16a34a; }
+        .bg-yellow-100 { background-color: #fef3c7; }
+        .bg-yellow-50 { background-color: #fefce8; }
+        .bg-gray-600 { background-color: #4b5563; }
+        .text-white { color: white; }
+        .text-gray-400 { color: #9ca3af; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-700 { color: #374151; }
+        .text-red-600 { color: #dc2626; }
+        .text-red-800 { color: #991b1b; }
+        .text-yellow-600 { color: #ca8a04; }
+        .text-yellow-800 { color: #713f12; }
+        .text-green-800 { color: #166534; }
+        .text-blue-600 { color: #2563eb; }
+        .bg-gradient-to-br { background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 50%, #0d9488 100%); }
+        button { cursor: pointer; border: none; font-family: inherit; font-size: inherit; transition: all 0.15s; }
+        button:hover:not(:disabled) { opacity: 0.9; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        input, textarea, select { font-family: inherit; font-size: inherit; padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.5rem; transition: all 0.15s; }
+        input:focus, textarea:focus, select:focus { outline: none; box-shadow: 0 0 0 2px #2563eb; border-color: transparent; }
+        textarea { resize: vertical; }
+        .header { background-color: white; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); border-bottom: 1px solid #e5e7eb; padding: 1rem 1.5rem; }
+        .sidebar { width: 16rem; background-color: white; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); min-height: 100vh; border-right: 1px solid #e5e7eb; padding: 1rem; overflow-y: auto; }
+        .sidebar button { width: 100%; display: flex; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; transition: all 0.15s; margin-bottom: 0.5rem; background: none; border: none; align-items: center; color: #374151; }
+        .sidebar button.active { background-color: #2563eb; color: white; }
+        .sidebar button:not(.active):hover { background-color: #f3f4f6; }
+        .main-content { flex: 1; padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 80px); }
+        .card { background-color: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); padding: 1.5rem; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+        th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.75rem; font-weight: 500; color: #6b7280; text-transform: uppercase; }
+        td { padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; }
+        tbody tr:hover { background-color: #f9fafb; }
+        .badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; }
+        .badge.green { background-color: #dcfce7; color: #166534; }
+        .badge.yellow { background-color: #fef3c7; color: #854d0e; }
+        .badge.red { background-color: #fee2e2; color: #991b1b; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .grid { display: grid; }
+        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .grid.gap-6 { gap: 1.5rem; }
+        .grid.gap-4 { gap: 1rem; }
+        .divide-y > * + * { border-top: 1px solid #e5e7eb; }
+        .overflow-y-auto { overflow-y: auto; max-height: 24rem; }
+        video { width: 100%; border-radius: 0.5rem; background-color: #000; }
+        canvas { border: 2px solid #d1d5db; border-radius: 0.5rem; width: 100%; cursor: crosshair; display: block; }
+        audio { width: 100%; }
+        .animate-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -66,7 +185,534 @@
                 { id: 3, type: 'interaction', message: 'Drug interaction warning: Warfarin + Aspirin', time: '1 hour ago', priority: 'high' }
             ]
         };
-        /* ...all JS logic from your file... */
+
+        function logAudit(action, details) {
+            state.auditLog.push({
+                timestamp: new Date().toISOString(),
+                user: state.currentUser?.username || 'Unknown',
+                action,
+                details
+            });
+        }
+
+        function handleBiometricLogin() {
+            state.currentUser = { username: 'biometric_user', role: 'nurse' };
+            logAudit('LOGIN', 'Biometric login');
+            render();
+        }
+
+        function handleLogout() {
+            logAudit('LOGOUT', 'User logged out');
+            state.currentUser = null;
+            state.activeTab = 'dashboard';
+            render();
+        }
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('video-stream');
+                if (video) { video.srcObject = stream; state.cameraActive = true; logAudit('CAMERA_STARTED', 'Camera activated'); render(); }
+            } catch (err) { alert('Camera error: ' + err.message); }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video-stream');
+            if (video) {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                state.capturedPhoto = canvas.toDataURL('image/jpeg');
+                stopCamera();
+                logAudit('PHOTO_CAPTURED', 'Photo captured');
+                render();
+            }
+        }
+
+        function stopCamera() {
+            const video = document.getElementById('video-stream');
+            if (video && video.srcObject) {
+                video.srcObject.getTracks().forEach(t => t.stop());
+                state.cameraActive = false;
+            }
+        }
+
+        let mediaRecorder = null, chunks = [];
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                chunks = [];
+                mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/webm' });
+                    state.voiceNotes.push({ url: URL.createObjectURL(blob), timestamp: new Date().toISOString() });
+                    stream.getTracks().forEach(t => t.stop());
+                    logAudit('VOICE_NOTE', 'Voice note recorded');
+                    render();
+                };
+                mediaRecorder.start();
+                state.isRecording = true;
+                render();
+            } catch (err) { alert('Microphone error: ' + err.message); }
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && state.isRecording) { mediaRecorder.stop(); state.isRecording = false; render(); }
+        }
+
+        function startDrawing(e) {
+            state.isDrawing = true;
+            const canvas = document.getElementById('sig-canvas');
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            const ctx = canvas.getContext('2d');
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!state.isDrawing) return;
+            const canvas = document.getElementById('sig-canvas');
+            if (!canvas) return;
+            const rect = canvas.getBoundingClientRect();
+            const ctx = canvas.getContext('2d');
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+        }
+
+        function endDrawing() { state.isDrawing = false; }
+
+        function saveSignature() {
+            const canvas = document.getElementById('sig-canvas');
+            if (canvas) {
+                state.signature = canvas.toDataURL();
+                logAudit('SIGNATURE', 'Signature saved');
+                render();
+            }
+        }
+
+        function clearSignature() {
+            const canvas = document.getElementById('sig-canvas');
+            if (canvas) {
+                canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+                state.signature = null;
+                render();
+            }
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+
+            if (!state.currentUser) {
+                app.innerHTML = `
+                    <div class="min-h-screen bg-gradient-to-br flex items-center justify-center p-4">
+                        <div class="card" style="width: 100%; max-width: 28rem;">
+                            <div class="text-center mb-8">
+                                <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-4" style="margin: 0 auto;">
+                                    <span style="font-size: 1.5rem;">🛡️</span>
+                                </div>
+                                <h1 class="text-3xl font-bold text-gray-800">HAVEN</h1>
+                                <p class="text-sm text-gray-600 mt-2">Home Assistance for Vital Everyday Needs</p>
+                                <p class="text-xs text-gray-500 mt-1">HIPAA Compliant Healthcare Platform</p>
+                            </div>
+                            <button onclick="handleBiometricLogin()" class="w-full bg-teal-600 text-white py-3 rounded-lg font-medium hover:bg-teal-700 flex items-center justify-center gap-2">
+                                👆 Biometric Login
+                            </button>
+                            <div class="mt-6 text-center text-xs text-gray-500">
+                                🔒 AES-256 Encrypted | TLS 1.3 | HIPAA Compliant
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            app.innerHTML = `
+                <div class="min-h-screen flex flex-col" style="display: flex; flex-direction: column; height: 100vh;">
+                    <header class="header flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <span style="font-size: 1.25rem;">🛡️</span>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold text-gray-800">HAVEN</h1>
+                                <p class="text-xs text-gray-500">HIPAA Compliant</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="text-right">
+                                <p class="text-sm font-medium">${state.currentUser.username}</p>
+                                <p class="text-xs text-gray-500">${state.currentUser.role}</p>
+                            </div>
+                            <button onclick="handleLogout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2">
+                                🚪 Logout
+                            </button>
+                        </div>
+                    </header>
+
+                    <div class="flex flex-1" style="display: flex; flex: 1; overflow: hidden;">
+                        <aside class="sidebar">
+                            ${['dashboard', 'notes', 'patients', 'medications', 'appointments', 'messages', 'capture', 'signature', 'voice', 'mileage', 'alerts', 'audit'].map(tab => {
+                                const labels = { dashboard: 'Dashboard', notes: 'Clinical Notes', patients: 'Patient Records', medications: 'Medications', appointments: 'Appointments', messages: 'Secure Messaging', capture: 'Photo Capture', signature: 'E-Signature', voice: 'Voice Notes', mileage: 'Travel Mileage', alerts: 'Alerts', audit: 'Audit Log' };
+                                return `<button onclick="state.activeTab='${tab}'; render();" class="${state.activeTab === tab ? 'active' : ''}" style="text-align:left">${labels[tab]}</button>`;
+                            }).join('')}
+                        </aside>
+
+                        <main class="main-content">
+                            ${state.activeTab === 'dashboard' ? `
+                                <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
+                                <div class="grid grid-cols-4 gap-6 mb-8">
+                                    <div class="card"><div class="flex items-center justify-between mb-2"><span style="font-size:1.5rem">👥</span><span class="text-2xl font-bold">24</span></div><p class="text-sm text-gray-600">Active Patients</p></div>
+                                    <div class="card"><div class="flex items-center justify-between mb-2"><span style="font-size:1.5rem">📅</span><span class="text-2xl font-bold">8</span></div><p class="text-sm text-gray-600">Appointments</p></div>
+                                    <div class="card"><div class="flex items-center justify-between mb-2"><span style="font-size:1.5rem">💊</span><span class="text-2xl font-bold">3</span></div><p class="text-sm text-gray-600">Medication Alerts</p></div>
+                                    <div class="card"><div class="flex items-center justify-between mb-2"><span style="font-size:1.5rem">💬</span><span class="text-2xl font-bold">12</span></div><p class="text-sm text-gray-600">Messages</p></div>
+                                </div>
+                                <div class="card mb-6">
+                                    <h3 class="text-lg font-bold mb-4">Quick Notes</h3>
+                                    <textarea placeholder="Type your note here..." onchange="state.newNote.content = this.value" value="${state.newNote.content}" rows="4" class="w-full" style="margin-bottom:1rem"></textarea>
+                                    <button onclick="saveQuickNote()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                                        💾 Save Note
+                                    </button>
+                                </div>
+                                <div class="card">
+                                    <h3 class="text-lg font-bold mb-4">Recent Notes</h3>
+                                    <div class="space-y-3">
+                                        ${state.notes.map(n => `
+                                            <div class="border rounded-lg p-4">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="font-medium">${n.author}</span>
+                                                    <span class="text-xs text-gray-500">${n.timestamp}</span>
+                                                </div>
+                                                <p class="text-sm text-gray-700">${n.content}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : state.activeTab === 'notes' ? `
+                                <h2 class="text-2xl font-bold mb-6">Clinical Notes</h2>
+                                <div class="card mb-6">
+                                    <h3 class="text-lg font-bold mb-4">Add New Note</h3>
+                                    <textarea placeholder="Type clinical note..." onchange="state.newNote.content = this.value" value="${state.newNote.content}" rows="6" class="w-full" style="margin-bottom:1rem"></textarea>
+                                    <button onclick="saveClinicNote()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                                        💾 Save Note
+                                    </button>
+                                </div>
+                                <div class="card">
+                                    <h3 class="text-lg font-bold mb-4">All Notes</h3>
+                                    ${state.notes.length === 0 ? `<p class="text-center text-gray-500 py-8">No notes yet</p>` : `
+                                        <div class="space-y-3">
+                                            ${state.notes.map(n => `
+                                                <div class="border rounded-lg p-4">
+                                                    <div class="flex items-center justify-between mb-2">
+                                                        <span class="font-medium">${n.author}</span>
+                                                        <span class="text-xs text-gray-500">${n.timestamp}</span>
+                                                    </div>
+                                                    <p class="text-sm text-gray-700">${n.content}</p>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    `}
+                                </div>
+                            ` : state.activeTab === 'capture' ? `
+                                <h2 class="text-2xl font-bold mb-6">Photo Capture</h2>
+                                <div class="card">
+                                    ${!state.cameraActive && !state.capturedPhoto ? `
+                                        <div class="text-center py-12">
+                                            <div style="font-size:3rem;margin-bottom:1rem">📷</div>
+                                            <button onclick="startCamera()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Start Camera</button>
+                                        </div>
+                                    ` : state.cameraActive ? `
+                                        <video id="video-stream" autoplay playsInline style="margin-bottom:1rem; min-height:300px"></video>
+                                        <div class="flex gap-3">
+                                            <button onclick="capturePhoto()" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Capture Photo</button>
+                                            <button onclick="stopCamera()" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700">Cancel</button>
+                                        </div>
+                                    ` : `
+                                        <img src="${state.capturedPhoto}" alt="Captured" class="w-full rounded-lg" style="margin-bottom:1rem">
+                                        <div class="flex gap-3">
+                                            <button onclick="state.capturedPhoto = null; render();" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Take Another</button>
+                                            <button onclick="logAudit('PHOTO_SAVED', 'Photo saved'); alert('Photo saved!'); state.capturedPhoto = null; render();" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">Save</button>
+                                        </div>
+                                    `}
+                                </div>
+                            ` : state.activeTab === 'signature' ? `
+                                <h2 class="text-2xl font-bold mb-6">Electronic Signature</h2>
+                                <div class="card">
+                                    <canvas id="sig-canvas" width="600" height="300" onmousedown="startDrawing(event)" onmousemove="draw(event)" onmouseup="endDrawing()" onmouseleave="endDrawing()" class="mb-4"></canvas>
+                                    <div class="flex gap-3 mb-4">
+                                        <button onclick="clearSignature()" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700">❌ Clear</button>
+                                        <button onclick="saveSignature()" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">💾 Save Signature</button>
+                                    </div>
+                                    ${state.signature ? `<div class="p-4 bg-green-50 border border-green-200 rounded-lg"><p class="text-sm text-green-800">✅ Signature saved</p></div>` : ''}
+                                </div>
+                            ` : state.activeTab === 'voice' ? `
+                                <h2 class="text-2xl font-bold mb-6">Voice Notes</h2>
+                                <div class="card">
+                                    <div class="text-center py-8">
+                                        <div style="font-size:3rem;margin-bottom:1rem;${state.isRecording ? 'animation: pulse 2s infinite' : ''}">🎤</div>
+                                        ${!state.isRecording ? `
+                                            <button onclick="startRecording()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Start Recording</button>
+                                        ` : `
+                                            <p class="text-lg font-semibold text-red-600 mb-4">Recording...</p>
+                                            <button onclick="stopRecording()" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700">Stop Recording</button>
+                                        `}
+                                    </div>
+                                    <div class="mt-6 space-y-3">
+                                        ${state.voiceNotes.length === 0 ? `<p class="text-center text-gray-500 py-8">No voice notes yet</p>` : state.voiceNotes.map((n, i) => `
+                                            <div class="border rounded-lg p-4">
+                                                <div class="flex items-center justify-between mb-3">
+                                                    <span class="text-sm font-medium">Recording ${state.voiceNotes.length - i}</span>
+                                                    <span class="text-xs text-gray-500">${new Date(n.timestamp).toLocaleString()}</span>
+                                                </div>
+                                                <audio controls src="${n.url}" class="w-full"></audio>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            ` : state.activeTab === 'patients' ? `
+                                <div class="flex items-center justify-between mb-6">
+                                    <h2 class="text-2xl font-bold">Patient Records</h2>
+                                    <button onclick="state.showAddPatient = !state.showAddPatient; render();" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Patient</button>
+                                </div>
+                                ${state.showAddPatient ? `
+                                    <div class="card mb-6">
+                                        <h3 class="text-lg font-semibold mb-4">Add New Patient</h3>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <input type="text" placeholder="Full Name" id="pa-name" class="px-4 py-2 border rounded-lg" />
+                                            <input type="date" id="pa-dob" class="px-4 py-2 border rounded-lg" />
+                                            <input type="text" placeholder="Allergies" id="pa-allergies" class="px-4 py-2 border rounded-lg" />
+                                            <input type="text" placeholder="Conditions" id="pa-conditions" class="px-4 py-2 border rounded-lg" />
+                                        </div>
+                                        <div class="flex gap-3 mt-4">
+                                            <button onclick="addPatient()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">Save Patient</button>
+                                            <button onclick="state.showAddPatient = false; render();" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">Cancel</button>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                <div class="card">
+                                    <table>
+                                        <thead><tr><th>Name</th><th>Age</th><th>Allergies</th><th>Conditions</th></tr></thead>
+                                        <tbody>${state.patients.map(p => `<tr><td class="font-medium">${p.name}</td><td>${p.age}</td><td class="text-red-600">${p.allergies}</td><td>${p.conditions}</td></tr>`).join('')}</tbody>
+                                    </table>
+                                </div>
+                            ` : state.activeTab === 'medications' ? `
+                                <div class="flex items-center justify-between mb-6">
+                                    <h2 class="text-2xl font-bold">Medication Management</h2>
+                                    <button onclick="state.showAddMedication = !state.showAddMedication; render();" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Medication</button>
+                                </div>
+                                ${state.showAddMedication ? `
+                                    <div class="card mb-6">
+                                        <h3 class="text-lg font-semibold mb-4">Add New Medication</h3>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <select id="nm-patient" class="px-4 py-2 border rounded-lg"><option value="">Select Patient</option>${state.patients.map(p => `<option value="${p.name}">${p.name}</option>`).join('')}</select>
+                                            <input type="text" placeholder="Medication Name" id="nm-drug" class="px-4 py-2 border rounded-lg" />
+                                            <input type="text" placeholder="Dosage (e.g., 10mg)" id="nm-dosage" class="px-4 py-2 border rounded-lg" />
+                                            <select id="nm-frequency" class="px-4 py-2 border rounded-lg"><option value="">Select Frequency</option><option value="Once daily">Once daily</option><option value="Twice daily">Twice daily</option><option value="Three times daily">Three times daily</option></select>
+                                        </div>
+                                        <div class="flex gap-3 mt-4">
+                                            <button onclick="addMedication()" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">Save Medication</button>
+                                            <button onclick="state.showAddMedication = false; render();" class="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700">Cancel</button>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                <div class="card">
+                                    <table>
+                                        <thead><tr><th>Patient</th><th>Medication</th><th>Dosage</th><th>Frequency</th><th>Status</th></tr></thead>
+                                        <tbody>${state.medications.map(m => `<tr><td class="font-medium">${m.patient}</td><td>${m.drug}</td><td>${m.dosage}</td><td>${m.frequency}</td><td><span class="badge ${m.status === 'on-time' ? 'green' : m.status === 'due-soon' ? 'yellow' : 'red'}">${m.status.toUpperCase()}</span></td></tr>`).join('')}</tbody>
+                                    </table>
+                                </div>
+                            ` : state.activeTab === 'appointments' ? `
+                                <h2 class="text-2xl font-bold mb-6">Appointments</h2>
+                                <div class="space-y-4">
+                                    ${state.appointments.map(a => `
+                                        <div class="card">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-4">
+                                                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center" style="font-size:1.5rem">📅</div>
+                                                    <div>
+                                                        <h3 class="text-lg font-semibold">${a.patient}</h3>
+                                                        <p class="text-sm text-gray-600">${a.type}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right">
+                                                    <p class="text-sm font-medium">${a.date}</p>
+                                                    <p class="text-sm text-gray-600">${a.time}</p>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 flex items-center gap-2 text-sm text-gray-600">📍 ${a.address}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : state.activeTab === 'messages' ? `
+                                <h2 class="text-2xl font-bold mb-6">Secure Messaging</h2>
+                                <div class="card">
+                                    <div class="space-y-4 mb-6 overflow-y-auto max-h-96">
+                                        ${state.messages.map(m => `
+                                            <div class="p-4 rounded-lg ${m.read ? 'bg-gray-50' : 'bg-blue-50 border border-blue-200'}">
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-medium">${m.from}</span>
+                                                        <span class="text-gray-400">→</span>
+                                                        <span class="text-gray-600">${m.to}</span>
+                                                    </div>
+                                                    <span class="text-xs text-gray-500">${m.time}</span>
+                                                </div>
+                                                <p class="text-sm">${m.message}</p>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="border-t pt-4">
+                                        <div class="flex gap-2">
+                                            <input type="text" id="msg-input" placeholder="Type encrypted message..." onchange="state.newMessage = this.value" onkeypress="if(event.key==='Enter') sendMsg()" class="flex-1" />
+                                            <button onclick="sendMsg()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">Send</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : state.activeTab === 'alerts' ? `
+                                <h2 class="text-2xl font-bold mb-6">Alerts & Notifications</h2>
+                                <div class="space-y-4">
+                                    ${state.alerts.map(a => `
+                                        <div class="card border-2 ${a.priority === 'high' ? 'border-red-300' : 'border-yellow-300'}">
+                                            <div class="flex items-start gap-4">
+                                                <div class="w-12 h-12 rounded-lg flex items-center justify-center ${a.priority === 'high' ? 'bg-red-100' : 'bg-yellow-100'}" style="font-size:1.5rem">🔔</div>
+                                                <div class="flex-1">
+                                                    <div class="flex items-center gap-2 mb-2">
+                                                        <span class="badge ${a.priority === 'high' ? 'red' : 'yellow'}">${a.priority.toUpperCase()}</span>
+                                                        <span class="text-xs text-gray-500">${a.time}</span>
+                                                    </div>
+                                                    <p>${a.message}</p>
+                                                    <button onclick="ackAlert(${a.id})" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm mt-4">Acknowledge</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : state.activeTab === 'mileage' ? `
+                                <h2 class="text-2xl font-bold mb-6">Travel & Mileage</h2>
+                                <div class="mb-6">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <span class="text-sm font-medium">Enable Tracking</span>
+                                        <input type="checkbox" id="m-toggle" ${state.mileageEnabled ? 'checked' : ''} onchange="state.mileageEnabled = this.checked; logAudit('MILEAGE_TRACKING', this.checked ? 'enabled' : 'disabled'); render();" />
+                                    </label>
+                                </div>
+                                ${!state.mileageEnabled ? `
+                                    <div class="card text-center py-12">
+                                        <div style="font-size:3rem;margin-bottom:1rem">🚗</div>
+                                        <h3 class="text-lg font-semibold mb-2">Mileage Tracking Disabled</h3>
+                                        <p class="text-gray-600 mb-4">Enable to log trips for reimbursement</p>
+                                        <button onclick="state.mileageEnabled = true; render();" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Enable Tracking</button>
+                                    </div>
+                                ` : `
+                                    <div class="grid grid-cols-4 gap-4 mb-6">
+                                        <div class="card"><div class="flex items-center justify-between mb-2"><span style="font-size:1.25rem">🚗</span><span class="text-2xl font-bold">${state.mileageTrips.reduce((s, t) => s + t.miles, 0).toFixed(1)}</span></div><p class="text-sm text-gray-600">Total Miles</p></div>
+                                        <div class="card"><div class="flex items-center justify-between mb-2"><span style="font-size:1.25rem">⏱️</span><span class="text-2xl font-bold">${state.mileageTrips.length}</span></div><p class="text-sm text-gray-600">Total Trips</p></div>
+                                        <div class="card"><div class="flex items-center justify-between mb-2"><span style="font-size:1.25rem">💵</span><span class="text-2xl font-bold">$${(state.mileageTrips.reduce((s, t) => s + t.miles, 0) * 0.67).toFixed(2)}</span></div><p class="text-sm text-gray-600">Reimbursement</p></div>
+                                        <div class="card"><div class="flex items-center justify-between mb-2"><span style="font-size:1.25rem">🗺️</span><span class="text-2xl font-bold">8m</span></div><p class="text-sm text-gray-600">Drive Time</p></div>
+                                    </div>
+                                    <div class="card">
+                                        <h3 class="text-lg font-semibold mb-4">Trip History</h3>
+                                        ${state.mileageTrips.map(t => `
+                                            <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg mb-3">
+                                                <div>
+                                                    <p class="font-medium">${t.patient}</p>
+                                                    <p class="text-sm text-gray-600">${t.purpose}</p>
+                                                    <p class="text-xs text-gray-500">${t.startAddress} to ${t.endAddress}</p>
+                                                </div>
+                                                <div class="text-right">
+                                                    <p class="font-bold text-blue-600">${t.miles} mi</p>
+                                                    <p class="text-sm text-gray-600">${t.duration}</p>
+                                                    <p class="text-xs text-green-700 font-semibold">$${(t.miles * 0.67).toFixed(2)}</p>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                `}
+                            ` : `
+                                <h2 class="text-2xl font-bold mb-6">Audit Log</h2>
+                                <div class="card">
+                                    <table>
+                                        <thead><tr><th>Timestamp</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+                                        <tbody>${state.auditLog.length === 0 ? '<tr><td colspan="4" class="text-center py-4 text-gray-500">No audit logs yet</td></tr>' : state.auditLog.map(e => `<tr><td class="text-sm">${new Date(e.timestamp).toLocaleString()}</td><td>${e.user}</td><td><span class="badge" style="background: #dbeafe; color: #1e40af;">${e.action}</span></td><td>${e.details}</td></tr>`).join('')}</tbody>
+                                    </table>
+                                </div>
+                            `}
+                        </main>
+                    </div>
+                </div>
+            `;
+
+            // Attach event listeners after render
+            setTimeout(() => {
+                const mToggle = document.getElementById('m-toggle');
+                if (mToggle) mToggle.checked = state.mileageEnabled;
+            }, 0);
+        }
+
+        function saveQuickNote() {
+            if (state.newNote.content.trim()) {
+                state.notes.unshift({ id: state.notes.length + 1, author: state.currentUser.username, content: state.newNote.content, timestamp: new Date().toLocaleString() });
+                logAudit('NOTE_CREATED', 'Quick note added');
+                state.newNote = { content: '' };
+                alert('Note saved!');
+                render();
+            }
+        }
+
+        function saveClinicNote() {
+            if (state.newNote.content.trim()) {
+                state.notes.unshift({ id: state.notes.length + 1, author: state.currentUser.username, content: state.newNote.content, timestamp: new Date().toLocaleString() });
+                logAudit('NOTE_CREATED', 'Clinical note saved');
+                state.newNote = { content: '' };
+                alert('Note saved!');
+                render();
+            }
+        }
+
+        function addPatient() {
+            const name = document.getElementById('pa-name').value;
+            const dob = document.getElementById('pa-dob').value;
+            const allergies = document.getElementById('pa-allergies').value;
+            const conditions = document.getElementById('pa-conditions').value;
+            if (!name || !dob) { alert('Please fill in name and DOB'); return; }
+            const age = new Date().getFullYear() - new Date(dob).getFullYear();
+            state.patients.push({ id: state.patients.length + 1, name, dob, age, allergies, conditions, lastVisit: new Date().toISOString().split('T')[0] });
+            logAudit('PATIENT_ADDED', 'New patient added');
+            state.showAddPatient = false;
+            render();
+        }
+
+        function addMedication() {
+            const patient = document.getElementById('nm-patient').value;
+            const drug = document.getElementById('nm-drug').value;
+            const dosage = document.getElementById('nm-dosage').value;
+            const frequency = document.getElementById('nm-frequency').value;
+            if (!patient || !drug || !dosage || !frequency) { alert('Please fill in all fields'); return; }
+            state.medications.push({ id: state.medications.length + 1, patient, drug, dosage, frequency, lastGiven: 'Not given yet', nextDue: 'Pending', status: 'on-time' });
+            logAudit('MEDICATION_ADDED', `New medication: ${drug} for ${patient}`);
+            state.newMedication = { patient: '', drug: '', dosage: '', frequency: '' };
+            state.showAddMedication = false;
+            alert('Medication added successfully!');
+            render();
+        }
+
+        function sendMsg() {
+            const inp = document.getElementById('msg-input');
+            if (!inp.value.trim()) return;
+            state.messages.push({ id: state.messages.length + 1, from: 'You', to: 'Select recipient', message: inp.value, time: 'Just now', read: true });
+            logAudit('MESSAGE_SENT', 'Secure message sent');
+            inp.value = '';
+            state.newMessage = '';
+            render();
+        }
+
+        function ackAlert(id) {
+            state.alerts = state.alerts.filter(a => a.id !== id);
+            logAudit('ALERT_ACKNOWLEDGED', 'Alert acknowledged');
+            render();
+        }
+
         render();
     </script>
 </body>
