@@ -268,19 +268,19 @@
         };
 
         // ===== SUPABASE SETUP =====
-        // Replace these with your actual Supabase credentials from: https://app.supabase.com/project/_/settings/api
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., 'https://xyz.supabase.co'
-        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Your anon/public key
+        const SUPABASE_URL = 'https://nfeymunhielqvtufrqqj.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mZXltdW5oaWVscXZ0dWZycXFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjMwNTQ4ODMsImV4cCI6MjA3ODYzMDg4M30.3FEqXFhcTFjcodbQRYw0u6WzqiIzZha1FqZvhj_Q53c';
         
         let supabase = null;
         let currentUserId = null;
 
-        // Initialize Supabase only if credentials are provided
-        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+        // Initialize Supabase
+        try {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('✅ Supabase initialized');
-        } else {
-            console.warn('⚠️ Supabase not configured - using local storage only');
+            console.log('✅ Supabase initialized successfully');
+        } catch (error) {
+            console.error('❌ Supabase initialization failed:', error);
+            console.warn('⚠️ Using local storage only');
         }
 
         // ===== DATA PERSISTENCE FUNCTIONS =====
