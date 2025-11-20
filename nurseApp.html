@@ -596,6 +596,8 @@
             if (video && video.srcObject) {
                 video.srcObject.getTracks().forEach(t => t.stop());
                 state.cameraActive = false;
+                logAudit('CAMERA_STOPPED', 'Camera deactivated');
+                render();
             }
         }
 
