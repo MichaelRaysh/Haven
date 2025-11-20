@@ -210,6 +210,8 @@
     </style>
 </head>
 <body>
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <div id="app"></div>
     <script>
         const state = {
@@ -265,6 +267,191 @@
             ]
         };
 
+        // ===== SUPABASE SETUP =====
+        // Replace these with your actual Supabase credentials from: https://app.supabase.com/project/_/settings/api
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // e.g., 'https://xyz.supabase.co'
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Your anon/public key
+        
+        let supabase = null;
+        let currentUserId = null;
+
+        // Initialize Supabase only if credentials are provided
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_KEY !== 'YOUR_SUPABASE_ANON_KEY') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('✅ Supabase initialized');
+        } else {
+            console.warn('⚠️ Supabase not configured - using local storage only');
+        }
+
+        // ===== DATA PERSISTENCE FUNCTIONS =====
+        async function loadAllData() {
+            if (!supabase || !currentUserId) return;
+            
+            try {
+                // Load patients
+                const { data: patients } = await supabase.from('patients').select('*').eq('user_id', currentUserId);
+                if (patients) state.patients = patients.map(p => ({ ...p, id: p.id }));
+
+                // Load notes
+                const { data: notes } = await supabase.from('notes').select('*').eq('user_id', currentUserId);
+                if (notes) state.notes = notes.map(n => ({ ...n, id: n.id, author: state.currentUser.username }));
+
+                // Load medications
+                const { data: medications } = await supabase.from('medications').select('*').eq('user_id', currentUserId);
+                if (medications) state.medications = medications.map(m => ({ ...m, id: m.id }));
+
+                // Load appointments
+                const { data: appointments} = await supabase.from('appointments').select('*').eq('user_id', currentUserId);
+                if (appointments) state.appointments = appointments.map(a => ({ ...a, id: a.id }));
+
+                // Load messages
+                const { data: messages } = await supabase.from('messages').select('*').eq('user_id', currentUserId);
+                if (messages) state.messages = messages.map(m => ({ ...m, id: m.id, from: m.sender, to: m.recipient, message: m.body }));
+
+                // Load mileage trips
+                const { data: trips } = await supabase.from('mileage_trips').select('*').eq('user_id', currentUserId);
+                if (trips) state.mileageTrips = trips.map(t => ({ ...t, id: t.id }));
+
+                console.log('✅ Data loaded from Supabase');
+                render();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        async function saveNote(note) {
+            if (!supabase || !currentUserId) return;
+            try {
+                const { data, error } = await supabase.from('notes').insert([{
+                    user_id: currentUserId,
+                    patient: note.patient || 'General',
+                    title: note.title || 'Quick Note',
+                    content: note.content,
+                    category: note.category || 'general',
+                    timestamp: new Date().toISOString()
+                }]).select();
+                if (error) throw error;
+                console.log('✅ Note saved to Supabase');
+                return data[0];
+            } catch (error) {
+                console.error('Error saving note:', error);
+            }
+        }
+
+        async function savePatient(patient) {
+            if (!supabase || !currentUserId) return;
+            try {
+                const { data, error } = await supabase.from('patients').insert([{
+                    user_id: currentUserId,
+                    name: patient.name,
+                    age: patient.age,
+                    allergies: patient.allergies,
+                    conditions: patient.conditions,
+                    last_visit: patient.lastVisit || new Date().toISOString().split('T')[0]
+                }]).select();
+                if (error) throw error;
+                console.log('✅ Patient saved to Supabase');
+                return data[0];
+            } catch (error) {
+                console.error('Error saving patient:', error);
+            }
+        }
+
+        async function saveMedication(medication) {
+            if (!supabase || !currentUserId) return;
+            try {
+                const { data, error } = await supabase.from('medications').insert([{
+                    user_id: currentUserId,
+                    patient: medication.patient,
+                    drug: medication.drug,
+                    dosage: medication.dosage,
+                    frequency: medication.frequency,
+                    status: medication.status || 'on-time'
+                }]).select();
+                if (error) throw error;
+                console.log('✅ Medication saved to Supabase');
+                return data[0];
+            } catch (error) {
+                console.error('Error saving medication:', error);
+            }
+        }
+
+        async function savePhotoToSupabase(photoDataUrl) {
+            if (!supabase || !currentUserId) return photoDataUrl;
+            try {
+                // Convert data URL to blob
+                const response = await fetch(photoDataUrl);
+                const blob = await response.blob();
+                const fileName = `${currentUserId}/photos/${Date.now()}.jpg`;
+                
+                // Upload to Supabase Storage
+                const { data, error } = await supabase.storage
+                    .from('media')
+                    .upload(fileName, blob, { contentType: 'image/jpeg' });
+                
+                if (error) throw error;
+                
+                // Get public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('media')
+                    .getPublicUrl(fileName);
+                
+                console.log('✅ Photo saved to Supabase Storage');
+                return publicUrl;
+            } catch (error) {
+                console.error('Error saving photo:', error);
+                return photoDataUrl; // Return local data URL as fallback
+            }
+        }
+
+        async function saveSignatureToSupabase(signatureDataUrl) {
+            if (!supabase || !currentUserId) return signatureDataUrl;
+            try {
+                const response = await fetch(signatureDataUrl);
+                const blob = await response.blob();
+                const fileName = `${currentUserId}/signatures/${Date.now()}.png`;
+                
+                const { data, error } = await supabase.storage
+                    .from('media')
+                    .upload(fileName, blob, { contentType: 'image/png' });
+                
+                if (error) throw error;
+                
+                const { data: { publicUrl } } = supabase.storage
+                    .from('media')
+                    .getPublicUrl(fileName);
+                
+                console.log('✅ Signature saved to Supabase Storage');
+                return publicUrl;
+            } catch (error) {
+                console.error('Error saving signature:', error);
+                return signatureDataUrl;
+            }
+        }
+
+        async function saveVoiceNoteToSupabase(audioBlob, mimeType) {
+            if (!supabase || !currentUserId) return URL.createObjectURL(audioBlob);
+            try {
+                const fileName = `${currentUserId}/voice-notes/${Date.now()}.webm`;
+                
+                const { data, error } = await supabase.storage
+                    .from('media')
+                    .upload(fileName, audioBlob, { contentType: mimeType });
+                
+                if (error) throw error;
+                
+                const { data: { publicUrl } } = supabase.storage
+                    .from('media')
+                    .getPublicUrl(fileName);
+                
+                console.log('✅ Voice note saved to Supabase Storage');
+                return publicUrl;
+            } catch (error) {
+                console.error('Error saving voice note:', error);
+                return URL.createObjectURL(audioBlob);
+            }
+        }
+
         function logAudit(action, details) {
             state.auditLog.push({
                 timestamp: new Date().toISOString(),
@@ -274,9 +461,17 @@
             });
         }
 
-        function handleBiometricLogin() {
+        async function handleBiometricLogin() {
             state.currentUser = { username: 'biometric_user', role: 'nurse' };
+            
+            // Generate a consistent user ID for this session
+            currentUserId = 'demo-user-' + btoa(state.currentUser.username).substring(0, 20);
+            
             logAudit('LOGIN', 'Biometric login');
+            
+            // Load data from Supabase if available
+            await loadAllData();
+            
             render();
         }
 
@@ -313,14 +508,18 @@
             }
         }
 
-        function capturePhoto() {
+        async function capturePhoto() {
             const video = document.getElementById('video-stream');
             if (video) {
                 const canvas = document.createElement('canvas');
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
                 canvas.getContext('2d').drawImage(video, 0, 0);
-                state.capturedPhoto = canvas.toDataURL('image/jpeg');
+                const photoDataUrl = canvas.toDataURL('image/jpeg');
+                
+                // Save to Supabase Storage
+                state.capturedPhoto = await savePhotoToSupabase(photoDataUrl);
+                
                 stopCamera();
                 logAudit('PHOTO_CAPTURED', 'Photo captured');
                 render();
@@ -353,9 +552,13 @@
                 mediaRecorder = new MediaRecorder(stream, { mimeType });
                 chunks = [];
                 mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-                mediaRecorder.onstop = () => {
+                mediaRecorder.onstop = async () => {
                     const blob = new Blob(chunks, { type: mimeType });
-                    state.voiceNotes.push({ url: URL.createObjectURL(blob), timestamp: new Date().toISOString(), type: mimeType });
+                    
+                    // Save to Supabase Storage
+                    const audioUrl = await saveVoiceNoteToSupabase(blob, mimeType);
+                    
+                    state.voiceNotes.push({ url: audioUrl, timestamp: new Date().toISOString(), type: mimeType });
                     stream.getTracks().forEach(t => t.stop());
                     logAudit('VOICE_NOTE', 'Voice note recorded');
                     render();
@@ -393,11 +596,16 @@
 
         function endDrawing() { state.isDrawing = false; }
 
-        function saveSignature() {
+        async function saveSignature() {
             const canvas = document.getElementById('sig-canvas');
             if (canvas) {
-                state.signature = canvas.toDataURL();
+                const signatureDataUrl = canvas.toDataURL();
+                
+                // Save to Supabase Storage
+                state.signature = await saveSignatureToSupabase(signatureDataUrl);
+                
                 logAudit('SIGNATURE', 'Signature saved');
+                alert('Signature saved!');
                 render();
             }
         }
@@ -764,9 +972,22 @@
             }, 0);
         }
 
-        function saveQuickNote() {
+        async function saveQuickNote() {
             if (state.newNote.content.trim()) {
-                state.notes.unshift({ id: state.notes.length + 1, author: state.currentUser.username, content: state.newNote.content, timestamp: new Date().toLocaleString() });
+                const newNote = { 
+                    id: state.notes.length + 1, 
+                    author: state.currentUser.username, 
+                    content: state.newNote.content, 
+                    timestamp: new Date().toLocaleString(),
+                    patient: 'General',
+                    title: 'Quick Note',
+                    category: 'general'
+                };
+                state.notes.unshift(newNote);
+                
+                // Save to Supabase
+                await saveNote(newNote);
+                
                 logAudit('NOTE_CREATED', 'Quick note added');
                 state.newNote = { content: '' };
                 alert('Note saved!');
@@ -774,9 +995,22 @@
             }
         }
 
-        function saveClinicNote() {
+        async function saveClinicNote() {
             if (state.newNote.content.trim()) {
-                state.notes.unshift({ id: state.notes.length + 1, author: state.currentUser.username, content: state.newNote.content, timestamp: new Date().toLocaleString() });
+                const newNote = { 
+                    id: state.notes.length + 1, 
+                    author: state.currentUser.username, 
+                    content: state.newNote.content, 
+                    timestamp: new Date().toLocaleString(),
+                    patient: 'General',
+                    title: 'Clinical Note',
+                    category: 'general'
+                };
+                state.notes.unshift(newNote);
+                
+                // Save to Supabase
+                await saveNote(newNote);
+                
                 logAudit('NOTE_CREATED', 'Clinical note saved');
                 state.newNote = { content: '' };
                 alert('Note saved!');
@@ -784,26 +1018,36 @@
             }
         }
 
-        function addPatient() {
+        async function addPatient() {
             const name = document.getElementById('pa-name').value;
             const dob = document.getElementById('pa-dob').value;
             const allergies = document.getElementById('pa-allergies').value;
             const conditions = document.getElementById('pa-conditions').value;
             if (!name || !dob) { alert('Please fill in name and DOB'); return; }
             const age = new Date().getFullYear() - new Date(dob).getFullYear();
-            state.patients.push({ id: state.patients.length + 1, name, dob, age, allergies, conditions, lastVisit: new Date().toISOString().split('T')[0] });
+            const newPatient = { id: state.patients.length + 1, name, dob, age, allergies, conditions, lastVisit: new Date().toISOString().split('T')[0] };
+            state.patients.push(newPatient);
+            
+            // Save to Supabase
+            await savePatient(newPatient);
+            
             logAudit('PATIENT_ADDED', 'New patient added');
             state.showAddPatient = false;
             render();
         }
 
-        function addMedication() {
+        async function addMedication() {
             const patient = document.getElementById('nm-patient').value;
             const drug = document.getElementById('nm-drug').value;
             const dosage = document.getElementById('nm-dosage').value;
             const frequency = document.getElementById('nm-frequency').value;
             if (!patient || !drug || !dosage || !frequency) { alert('Please fill in all fields'); return; }
-            state.medications.push({ id: state.medications.length + 1, patient, drug, dosage, frequency, lastGiven: 'Not given yet', nextDue: 'Pending', status: 'on-time' });
+            const newMedication = { id: state.medications.length + 1, patient, drug, dosage, frequency, lastGiven: 'Not given yet', nextDue: 'Pending', status: 'on-time' };
+            state.medications.push(newMedication);
+            
+            // Save to Supabase
+            await saveMedication(newMedication);
+            
             logAudit('MEDICATION_ADDED', `New medication: ${drug} for ${patient}`);
             state.newMedication = { patient: '', drug: '', dosage: '', frequency: '' };
             state.showAddMedication = false;
