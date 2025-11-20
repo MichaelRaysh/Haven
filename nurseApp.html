@@ -376,6 +376,63 @@
             }
         }
 
+        async function saveAppointment(appointment) {
+            if (!supabase || !currentUserId) return;
+            try {
+                const { data, error } = await supabase.from('appointments').insert([{
+                    user_id: currentUserId,
+                    patient: appointment.patient,
+                    type: appointment.type,
+                    date: appointment.date,
+                    time: appointment.time,
+                    address: appointment.address
+                }]).select();
+                if (error) throw error;
+                console.log('✅ Appointment saved to Supabase');
+                return data[0];
+            } catch (error) {
+                console.error('Error saving appointment:', error);
+            }
+        }
+
+        async function saveMessage(message) {
+            if (!supabase || !currentUserId) return;
+            try {
+                const { data, error } = await supabase.from('messages').insert([{
+                    user_id: currentUserId,
+                    sender: message.from,
+                    recipient: message.to,
+                    body: message.message,
+                    read: message.read || false
+                }]).select();
+                if (error) throw error;
+                console.log('✅ Message saved to Supabase');
+                return data[0];
+            } catch (error) {
+                console.error('Error saving message:', error);
+            }
+        }
+
+        async function saveMileageTrip(trip) {
+            if (!supabase || !currentUserId) return;
+            try {
+                const { data, error } = await supabase.from('mileage_trips').insert([{
+                    user_id: currentUserId,
+                    patient: trip.patient,
+                    purpose: trip.purpose,
+                    start_address: trip.startAddress,
+                    end_address: trip.endAddress,
+                    miles: trip.miles,
+                    duration: trip.duration
+                }]).select();
+                if (error) throw error;
+                console.log('✅ Mileage trip saved to Supabase');
+                return data[0];
+            } catch (error) {
+                console.error('Error saving mileage trip:', error);
+            }
+        }
+
         async function savePhotoToSupabase(photoDataUrl) {
             if (!supabase || !currentUserId) return photoDataUrl;
             try {
@@ -444,7 +501,15 @@
                     .from('media')
                     .getPublicUrl(fileName);
                 
-                console.log('✅ Voice note saved to Supabase Storage');
+                // Also save metadata to database
+                await supabase.from('voice_notes').insert([{
+                    user_id: currentUserId,
+                    title: `Voice Note ${new Date().toLocaleString()}`,
+                    audio_url: publicUrl,
+                    duration: 0
+                }]);
+                
+                console.log('✅ Voice note saved to Supabase Storage and Database');
                 return publicUrl;
             } catch (error) {
                 console.error('Error saving voice note:', error);
@@ -755,7 +820,7 @@
                                         <img src="${state.capturedPhoto}" alt="Captured" class="w-full rounded-lg" style="margin-bottom:1rem">
                                         <div class="flex gap-3">
                                             <button onclick="state.capturedPhoto = null; render();" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700">Take Another</button>
-                                            <button onclick="logAudit('PHOTO_SAVED', 'Photo saved'); alert('Photo saved!'); state.capturedPhoto = null; render();" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">Save</button>
+                                            <button onclick="savePhotoToSupabase(state.capturedPhoto).then(() => { logAudit('PHOTO_SAVED', 'Photo saved'); alert('Photo saved to Supabase!'); state.capturedPhoto = null; render(); });" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">Save</button>
                                         </div>
                                     `}
                                 </div>
@@ -1055,10 +1120,15 @@
             render();
         }
 
-        function sendMsg() {
+        async function sendMsg() {
             const inp = document.getElementById('msg-input');
             if (!inp.value.trim()) return;
-            state.messages.push({ id: state.messages.length + 1, from: 'You', to: 'Select recipient', message: inp.value, time: 'Just now', read: true });
+            const newMessage = { id: state.messages.length + 1, from: 'You', to: 'Select recipient', message: inp.value, time: 'Just now', read: true };
+            state.messages.push(newMessage);
+            
+            // Save to Supabase
+            await saveMessage(newMessage);
+            
             logAudit('MESSAGE_SENT', 'Secure message sent');
             inp.value = '';
             state.newMessage = '';
